@@ -5,7 +5,7 @@ window.onload = function() {
     if (document.querySelector('#check').checked) {
       chrome.identity.getAuthToken({interactive: true}, function(token) {
         chrome.storage.sync.set({token: token}, function() {
-          console.log("Token value is set to " + token);
+            console.log("Token saved in storage " + token)
         });
       });
     }

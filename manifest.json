@@ -3,6 +3,11 @@
     "version": "0.1",
     "manifest_version": 2,
     "content_security_policy": "script-src 'self' https://apis.google.com/; object-src 'self'",
+    "oauth2":{
+		"client_id":"939578646176-v6c694v99avks940898fvi8jmnruoso9.apps.googleusercontent.com",
+		"scopes":["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    },
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvD0j1f80ucKi96W3lAGmcJvHE13LnijS300Zwk1U/ciGBDNiHMW5Az+ITFv9bK25HEQ2DAgZzNy4BGZ/xAIpwvlxsPax2pzHePu2NyHHvMS2f4JX6GJvOLdG9CtRNnqA+tGdW+TdWMNLvhqlB+NI7xdPaIezp2KHXUejcrUi2c3CU03QJHSsKWbL+9McjTOgMgtEbIG2QrHY9PceHxkCeSxRETx3hxhnVT14MPYGInUlMQqVY7wH/bqAi5Lk4tJNEKYhdytr1kGafqGhjaLv3Jnl+gGyLkgjJJTghM/urHo/d/MdHlGJsLIZV7462/6RiJVgJd28xGpbsddsanO3GwIDAQAB",
     "content_scripts": [
         {
             "run_at": "document_idle",
