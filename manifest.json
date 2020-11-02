@@ -2,7 +2,7 @@
     "name": "Mr. Meet",
     "version": "0.1",
     "manifest_version": 2,
-    "content_script": [
+    "content_scripts": [
         {
             "run_at": "document_idle",
             "matches":[
@@ -16,7 +16,7 @@
         }
     ],
     "background": {
-        "scripts": ["scripts/background.js"],
+        "page": "html/background.html",
         "persistent": false
     },
     "page_action": {
