@@ -1,0 +1,45 @@
+{
+    "name": "Mr. Meet",
+    "version": "0.1",
+    "manifest_version": 2,
+    "content_script": [
+        {
+            "run_at": "document_idle",
+            "matches":[
+                "https://meet.google.com/*"
+            ],
+            "js":[
+                "js/jquery",
+                "js/sweet-alert",
+                "scripts/content.js"
+            ]
+        }
+    ],
+    "background": {
+        "scripts": ["scripts/background.js"],
+        "persistent": false
+    },
+    "page_action": {
+        "default_popup": "scripts/popup.html",
+        "default_icon": {
+        "16": "images/16.png",
+        "32": "images/32.png",
+        "48": "images/48.png",
+        "128": "images/128.png"
+        }
+    },
+    "icons": {
+        "16": "images/16.png",
+        "32": "images/32.png",
+        "48": "images/48.png",
+        "128": "images/128.png"
+    },
+    "permissions": [
+        "identity",
+        "identity.email",
+        "storage",
+        "tabs",
+        "https://meet.google.com/*",
+        "https://www.googleapis.com/*"
+    ]
+}
