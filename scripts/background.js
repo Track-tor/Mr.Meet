@@ -1,20 +1,34 @@
 const API_KEY = 'AIzaSyCqS8Ur850llY5mXGy9QA7OsCwpx0wweBw';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://sheets.googleapis.com/$discovery/rest?version=v4"];
 
+
 function onGAPILoad() {
   gapi.client.init({
-    // Don't pass client nor scope as these will init auth2, which we don't want
     apiKey: API_KEY,
     discoveryDocs: DISCOVERY_DOCS,
-  }).then(function () {
-    console.log('gapi initialized')
-    chrome.identity.getAuthToken({interactive: true}, function(token) {
-      console.log(token)
-      gapi.auth.setToken({
-        'access_token': token,
-      });
-    })
-  }, function(error) {
-    console.log('error', error)
   });
 }
+
+
+//listeners for communication
+chrome.extension.onMessage.addListener(
+  async function(request, sender, sendResponse) {
+    if (request.msg == "getToken"){
+      chrome.identity.getAuthToken({interactive: true}, function(token) {
+        gapi.auth.setToken({
+          'access_token': token,
+        });
+        //Save the token somewhere(return it to sender, cookies, etc)
+      })
+    }
+    else if (request.msg == "attendance"){
+      //take attendance
+    }
+    else if (request.msg == 'question'){
+      //questions
+    }
+    else if (request.msg == 'answer'){
+      //answer
+    }
+  }
+);

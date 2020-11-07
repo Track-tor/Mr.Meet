@@ -17,16 +17,6 @@ function save_options() {
   chrome.storage.sync.set({key: featureState}, function() {
     console.log("Value is set to " + featureState);
   });
-  // Inject the file script when switch state changes
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      //action when switch change
-      /*
-      chrome.tabs.executeScript(
-        tabs[0].id,
-        {file: 'inject.js'
-      }); 
-      */
-  });
 }
 
 // Restores switch state using the preferences stored in chrome.storage.
@@ -40,5 +30,22 @@ function restore_options() {
 // Saves the updated status when the switch state changes
 function attachCheckboxHandlers() {
   const element = document.getElementById("check");
-  element.onchange = save_options;
+  element.addEventListener("change", () => {startExtension(element);});
+}
+
+//calls the content script to start/stop the extension and saves the state of the activation
+function startExtension(switchButton){
+  if(switchButton.checked){
+    //send the start message to the content script
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {msg: "start"});
+    });
+  }
+  else{
+    //send the stop message to the content script
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {msg: "stop"});
+    });
+  }
+  save_options();
 }
