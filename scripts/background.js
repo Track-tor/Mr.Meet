@@ -37,7 +37,7 @@ function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names
   });
 }
 
-function checkAttendanceFile(courseName, names, courseFolderId){
+function checkAttendanceFolder(courseName, names, courseFolderId){
   chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
     gapi.client.drive.files.list({
       q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
@@ -135,7 +135,7 @@ chrome.extension.onMessage.addListener(
       })
     }
     else if (request.msg == "attendance"){
-      checkAttendanceFile(request.courseName, request.names, request.courseFolderId);
+      checkAttendanceFolder(request.courseName, request.names, request.courseFolderId);
     }
     else if (request.msg == 'question'){
       //questions
