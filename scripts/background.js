@@ -24,6 +24,13 @@ function createFolder(folderName) {
   });
 }
 
+function test(){
+  gapi.client.drive.files.list({
+    q: "name='a'"
+  }).then( function(response) {
+    console.log(response);
+  });
+}
 
 //listeners for communication
 chrome.extension.onMessage.addListener(
@@ -51,7 +58,7 @@ chrome.extension.onMessage.addListener(
     }
     else if (request.msg == 'setDriveFolder'){
       //check if the folder exists, if not create it
-      createFolder("test");
+      test();
     }
   }
 );

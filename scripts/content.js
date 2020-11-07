@@ -97,6 +97,8 @@ function showAttendanceModal(){
         //Take attendance
         if (result.isConfirmed) {
             console.log(result.value)
+            attendance(result.value);
+
         }
         //Modal to create new course
         else if (result.isDenied) {
@@ -112,13 +114,14 @@ function showAttendanceModal(){
             //Take attendance
             if (result2.isConfirmed) {
                 console.log(result2.value)
+                attendance(result2.value);
             }
             })
         }
     })
 }
 
-function attendance(){
+function attendance(courseName){
     //TODO: MEJORAR
     var participantIds = [];
     var participantNames = [];
@@ -126,17 +129,25 @@ function attendance(){
     element.scrollTop = element.scrollHeight;
 
     if (element.scrollTop != 0) {
-        var participantNames = scrollList(element, participantIds, participantNames, "attendance");
+        var participantNames = scrollList(element, participantIds, participantNames, "attendance", courseName);
     }
     else {
         let values = collectParticipants(participantIds, participantNames);
         participantIds = values[0];
         participantNames = values[1];
         console.log(participantNames);
+        var data = {
+            msg: 'attendance',
+            names: participantNames,
+            ids: participantIds,
+            courseName: courseName,
+            meet_id: window.location.href.split('/').pop()
+        }
+        chrome.runtime.sendMessage(data);
     }
 }
 
-function scrollList(element, participantIds, participantNames, type) {
+function scrollList(element, participantIds, participantNames, type, courseName) {
     var num = element.scrollTop
     function scroll(n) {
         element.scrollTop = n
@@ -156,6 +167,7 @@ function scrollList(element, participantIds, participantNames, type) {
                     msg: 'attendance',
                     names: participantNames,
                     ids: participantIds,
+                    courseName: courseName,
                     meet_id: window.location.href.split('/').pop()
                 }
                 chrome.runtime.sendMessage(data);
