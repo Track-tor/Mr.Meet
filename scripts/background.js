@@ -24,41 +24,54 @@ function createFolder(folderName) {
   });
 }
 
-function test(){
-  gapi.client.drive.files.list({
-    q: "name='a'"
-  }).then( function(response) {
-    console.log(response);
-  });
-}
 
 //listeners for communication
 chrome.extension.onMessage.addListener(
   async function(request, sender, sendResponse) {
-    if (request.msg == "setTokenInApi"){
+    if (request.msg == "initializeApi"){
       chrome.storage.sync.get(['token'], function (token) {
         gapi.auth.setToken({
-          'access_token': token,
+          'access_token': token.token
+        })
+        gapi.client.drive.files.list({
+          q: "name='Mr Meet'"
+        }).then( function(response) {
+          if (response.result.files.length === 0) {
+            var body = {
+              'title': 'Mr Meet',
+              'name': 'Mr Meet',
+              'mimeType': "application/vnd.google-apps.folder"
+            };
+
+            gapi.client.drive.files.create({
+              'resource': body
+            }).then(function(response) {
+              switch(response.status){
+                case 200:
+                  var file = response.result;
+                  console.log('Created Folder Id: ', file.id);
+                  break;
+                default:
+                  console.log('Error creating the folder, '+response);
+                  break;
+                }
+            });
+          }
+          else{
+            console.log('archivo ya existe');
+          }
         });
-        //Save the token somewhere(return it to sender, cookies, etc)
       })
     }
     else if (request.msg == "attendance"){
       //take attendance
-
       console.log(request.names);
-
-
     }
     else if (request.msg == 'question'){
       //questions
     }
     else if (request.msg == 'answer'){
       //answer
-    }
-    else if (request.msg == 'setDriveFolder'){
-      //check if the folder exists, if not create it
-      test();
     }
   }
 );

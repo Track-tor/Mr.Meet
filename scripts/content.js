@@ -5,8 +5,7 @@ chrome.extension.onMessage.addListener(
     async function(request, sender, sendResponse) {
         if (request.msg == "start"){
             console.log("Start!");
-            sendMessage("setTokenInApi");
-            sendMessage("setDriveFolder"); //creates the /mrMeet drive folder
+            sendMessage("initializeApi");//intitializes api token and sets the Mr meet folder in drive
             interval = setInterval(addLayout, 1000);
         }
         else if(request.msg == "stop"){
