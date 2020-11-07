@@ -12,6 +12,11 @@ chrome.extension.onMessage.addListener(
             console.log("stop!");
             clearInterval(interval);
         }
+        else if (request.msg == "sendCourses"){
+            console.log(request.courses);
+            showAttendanceModal(request.courses);
+        }
+
     }
 );
 
@@ -60,7 +65,7 @@ function addLayout(){
             </span>
         </div>`;//le asignamos un formato en HTML
 
-        attendanceButton.addEventListener("click",() => {showAttendanceModal();});//le agregamos la funcion de tomar asistencia
+        attendanceButton.addEventListener("click",() => {getCourses();});//le agregamos la funcion de tomar asistencia
         extraBoard.insertBefore(attendanceButton,null);//insertar el boton en el tablero extra
 
         sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
@@ -75,16 +80,17 @@ function sendMessage(message){
 }
 
 
-function showAttendanceModal(){
+
+function getCourses(){
+      chrome.runtime.sendMessage({msg: 'getCourses'});
+}
+
+
+function showAttendanceModal(courses){
     Swal.fire({
         title: 'Select a Course',
         input: 'select',
-        inputOptions: {
-            apples: 'Apples',
-            bananas: 'Bananas',
-            grapes: 'Grapes',
-            oranges: 'Oranges'
-        },
+        inputOptions: courses,
         inputPlaceholder: 'Select a course',
         showCancelButton: true,
         showDenyButton: true,
@@ -93,11 +99,10 @@ function showAttendanceModal(){
         denyButtonText: 'New Course',
         denyButtonColor: 'LightSeaGreen'
     }).then((result) => {
+        console.log(result);
         //Take attendance
         if (result.isConfirmed) {
-            console.log(result.value)
-            attendance(result.value);
-
+            attendance(courses[result.value], result.value);
         }
         //Modal to create new course
         else if (result.isDenied) {
@@ -120,7 +125,7 @@ function showAttendanceModal(){
     })
 }
 
-function attendance(courseName){
+function attendance(courseName, courseFolderId){
     //TODO: MEJORAR
     var participantIds = [];
     var participantNames = [];
@@ -140,6 +145,7 @@ function attendance(courseName){
             names: participantNames,
             ids: participantIds,
             courseName: courseName,
+            courseFolderId: courseFolderId,
             meet_id: window.location.href.split('/').pop()
         }
         chrome.runtime.sendMessage(data);

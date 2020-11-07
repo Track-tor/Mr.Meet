@@ -9,8 +9,9 @@ function onGAPILoad() {
   });
 }
 
-function createFolder(folderName) {
+function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names = null, courseFolderId = null) {
   var body = {
+    'parents': isCourseFolder ? [mrmeetid] : [] , 
     'name': folderName,
     'mimeType': "application/vnd.google-apps.folder"
   };
@@ -20,7 +21,14 @@ function createFolder(folderName) {
     switch(response.status){
       case 200:
         var file = response.result;
-        console.log('Created Folder Id: ', file.id);
+        if (!isCourseFolder){
+          chrome.storage.sync.set({mrmeetid: file.id}, function() {
+            console.log('Created Folder Id: ', file.id);
+          });
+        }
+        else{
+          passAttendance(names, courseFolderId);
+        }
         break;
       default:
         console.log('Error creating the folder, '+response);
@@ -29,10 +37,85 @@ function createFolder(folderName) {
   });
 }
 
+function checkAttendanceFile(courseName, names, courseFolderId){
+  chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
+    gapi.client.drive.files.list({
+      q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
+    }).then( function(response) {
+      var exists = false
+      for (let element of response.result.files){
+        if(element.name == courseName){
+          exists = true;
+          break;
+        }
+      }
+      if(exists){
+        console.log("course folder exists...");
+        passAttendance(courseName, names, courseFolderId);
+      }
+      else{
+        console.log("creating folder...");
+        createFolder(courseName, true, mrmeetid.mrmeetid, names, courseFolderId);
+      }
+
+    });
+  });
+}
+
+function passAttendance(courseName, names, courseFolderId){
+  console.log(courseName);
+  console.log(names);
+  console.log(courseFolderId);
+
+  gapi.client.drive.files.list({
+    q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
+  }).then(function(response) {
+    var exists = false
+    for (let element of response.result.files){
+      if(element.name == courseName+" Attendance"){
+        exists = true;
+        break;
+      }
+    }
+    if(exists){
+      console.log("attendance sheet exists...");
+      addColumnToSheet();
+      
+    }
+    else{
+      console.log("creating attendance sheet...");
+      createSheet(courseName, courseFolderId);
+      addColumnToSheet();
+    }
+  });
+}
+
+function createSheet(courseName, courseFolderId){
+  var body = {
+    'parents': [courseFolderId], 
+    'name': courseName+" Attendance",
+    'mimeType': "application/vnd.google-apps.spreadsheet"
+  };
+  gapi.client.drive.files.create({
+    'resource': body
+  }).then((response) => {
+    if(response.ok){
+      console.log(response.result.id);
+    }
+    else{
+      //TODO: implementar manejo de errores
+    }
+  });
+}
+
+
+function addColumnToSheet(){
+
+}
 
 //listeners for communication
 chrome.extension.onMessage.addListener(
-  async function(request, sender, sendResponse) {
+  function(request, sender, sendResponse) {
     if (request.msg == "initializeApi"){
       chrome.storage.sync.get(['token'], function (token) {
         gapi.auth.setToken({
@@ -52,14 +135,28 @@ chrome.extension.onMessage.addListener(
       })
     }
     else if (request.msg == "attendance"){
-      //take attendance
-      console.log(request.names);
+      checkAttendanceFile(request.courseName, request.names, request.courseFolderId);
     }
     else if (request.msg == 'question'){
       //questions
     }
     else if (request.msg == 'answer'){
       //answer
+    }
+    else if (request.msg == 'getCourses'){
+      chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
+        gapi.client.drive.files.list({
+          q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
+        }).then( function(response) {
+          var courseNames = {};
+          for (let element of response.result.files){
+            courseNames[element.id] = element.name;
+          }
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCourses", courses: courseNames});
+          });
+        });
+      });
     }
   }
 );
