@@ -11,16 +11,21 @@ function onGAPILoad() {
 
 function createFolder(folderName) {
   var body = {
-    'title': folderName,
+    'name': folderName,
     'mimeType': "application/vnd.google-apps.folder"
   };
-
-  var request = gapi.client.drive.files.insert({
+  gapi.client.drive.files.create({
     'resource': body
-  });
-
-  request.execute(function(resp) {
-    console.log('Folder ID: ' + resp.id);
+  }).then(function(response) {
+    switch(response.status){
+      case 200:
+        var file = response.result;
+        console.log('Created Folder Id: ', file.id);
+        break;
+      default:
+        console.log('Error creating the folder, '+response);
+        break;
+    }
   });
 }
 
@@ -36,26 +41,9 @@ chrome.extension.onMessage.addListener(
         gapi.client.drive.files.list({
           q: "name='Mr Meet'"
         }).then( function(response) {
-          if (response.result.files.length === 0) {
-            var body = {
-              'title': 'Mr Meet',
-              'name': 'Mr Meet',
-              'mimeType': "application/vnd.google-apps.folder"
-            };
-
-            gapi.client.drive.files.create({
-              'resource': body
-            }).then(function(response) {
-              switch(response.status){
-                case 200:
-                  var file = response.result;
-                  console.log('Created Folder Id: ', file.id);
-                  break;
-                default:
-                  console.log('Error creating the folder, '+response);
-                  break;
-                }
-            });
+          if (response.result.files.length == 0) {
+            console.log('archivo no existe');
+            createFolder("Mr Meet");
           }
           else{
             console.log('archivo ya existe');
