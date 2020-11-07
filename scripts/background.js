@@ -9,6 +9,21 @@ function onGAPILoad() {
   });
 }
 
+function createFolder(folderName) {
+  var body = {
+    'title': folderName,
+    'mimeType': "application/vnd.google-apps.folder"
+  };
+
+  var request = gapi.client.drive.files.insert({
+    'resource': body
+  });
+
+  request.execute(function(resp) {
+    console.log('Folder ID: ' + resp.id);
+  });
+}
+
 
 //listeners for communication
 chrome.extension.onMessage.addListener(
@@ -23,12 +38,20 @@ chrome.extension.onMessage.addListener(
     }
     else if (request.msg == "attendance"){
       //take attendance
+
+      console.log(request.names);
+
+
     }
     else if (request.msg == 'question'){
       //questions
     }
     else if (request.msg == 'answer'){
       //answer
+    }
+    else if (request.msg == 'setDriveFolder'){
+      //check if the folder exists, if not create it
+      createFolder("test");
     }
   }
 );

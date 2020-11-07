@@ -47,5 +47,8 @@
         "tabs",
         "https://meet.google.com/*",
         "https://www.googleapis.com/*"
+    ],
+    "web_accessible_resources": [
+        "res/*"
     ]
 }
