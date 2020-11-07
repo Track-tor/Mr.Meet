@@ -13,8 +13,8 @@ function onGAPILoad() {
 //listeners for communication
 chrome.extension.onMessage.addListener(
   async function(request, sender, sendResponse) {
-    if (request.msg == "getToken"){
-      chrome.identity.getAuthToken({interactive: true}, function(token) {
+    if (request.msg == "setTokenInApi"){
+      chrome.storage.sync.get(['token'], function (token) {
         gapi.auth.setToken({
           'access_token': token,
         });

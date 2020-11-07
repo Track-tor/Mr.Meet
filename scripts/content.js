@@ -3,7 +3,8 @@ chrome.extension.onMessage.addListener(
     async function(request, sender, sendResponse) {
         if (request.msg == "start"){
             console.log("Start!");
-            sendMessage("getToken");
+            sendMessage("setTokenInApi");
+            
         }
         else if(request.msg == "stop"){
             console.log("stop!");
