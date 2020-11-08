@@ -32,6 +32,10 @@ function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names
         break;
       default:
         console.log('Error creating the folder, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error creating the folder"});
+        });
         break;
     }
   });
@@ -62,7 +66,11 @@ function checkAttendanceFolder(courseName, names, courseFolderId){
           }
           break;
         default:
-          console.log('Error checking couse folder, '+response);
+          console.log('Error checking course folder, '+response);
+          //send error to content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error checking course folder"});
+          });
           break;
       }
 
@@ -98,6 +106,10 @@ function passAttendance(courseName, names, courseFolderId){
         break;
       default:
         console.log('Error taking attendance, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error getting course attendance spreadsheet"});
+        });
         break;
     }
 
@@ -119,6 +131,10 @@ async function createSheet(courseName, courseFolderId){
         return response.result.id
       default:
         console.log('Error creating the spreadsheet, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error creating course spreadsheet"});
+        });
         break;
     }
   });
@@ -136,6 +152,10 @@ function readSheet(sheetId){
         return response.result.values
       default:
         console.log('Error reading the spreadsheet, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error reading data in course spreadsheet"});
+        });
         break;
     }
   });
@@ -204,7 +224,7 @@ async function addColumnToSheet(names, sheetId){
           console.log('Error updating data in spreadsheet, '+response);
           //send error to content script
           chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {msg: "error"});
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error updating data in spreadsheet"});
           });
           break;
       }

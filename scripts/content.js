@@ -20,8 +20,8 @@ chrome.extension.onMessage.addListener(
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Oops...',
-                text: 'Something went wrong, please try again',
+                title: 'Something went wrong',
+                text: request.text,
                 showConfirmButton: false,
                 timer: 1500
               })
