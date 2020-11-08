@@ -1,15 +1,20 @@
 //listeners for communication
  var interval;
 
+ chrome.storage.sync.get(['key'], function (result) {
+    if (result.key) {
+        chrome.runtime.sendMessage({msg: 'initializeApi'});//intitializes api token and sets the Mr meet folder in drive
+        interval = setInterval(addLayout, 1000);
+    }
+ });
+
 chrome.extension.onMessage.addListener(
     async function(request, sender, sendResponse) {
         if (request.msg == "start"){
-            console.log("Start!");
             chrome.runtime.sendMessage({msg: 'initializeApi'});//intitializes api token and sets the Mr meet folder in drive
             interval = setInterval(addLayout, 1000);
         }
         else if(request.msg == "stop"){
-            console.log("Stop!");
             clearInterval(interval);
         }
         else if (request.msg == "sendCourses"){
@@ -24,19 +29,19 @@ chrome.extension.onMessage.addListener(
                 text: request.text,
                 showConfirmButton: false,
                 timer: 1500
-              })
+            })
         }
         else if (request.msg == "attendanceSuccessful") {
-              Swal.fire({
-                title: 'Attendance taken successfully',
-                text: "Do you want to open it?",
-                icon: "success",
-                showCancelButton: true,
-                confirmButtonText: 'Open'
-                }).then((result) => {
+            Swal.fire({
+            title: 'Attendance taken successfully',
+            text: "Do you want to open it?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: 'Open'
+            }).then((result) => {
                 if (result.isConfirmed) {
                     window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAttendance, "_blank",);
-              }
+                }
             })
         }
 
@@ -125,6 +130,14 @@ function showAttendanceModal(courses){
     }).then((result) => {
         //Take attendance
         if (result.isConfirmed && result.value) {
+            Swal.fire({
+                title: 'Taking attendance...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                onOpen: () => {
+                    Swal.showLoading();
+                }
+            })
             attendance(courses[result.value], "attendance", result.value);
         }
         //Modal to create new course
@@ -149,6 +162,14 @@ function showAttendanceModal(courses){
                 }).then((result2) => {
                 //Take attendance
                 if (result2.isConfirmed) {
+                    Swal.fire({
+                        title: 'Creating necessary files...',
+                        allowEscapeKey: false,
+                        allowOutsideClick: false,
+                        onOpen: () => {
+                            Swal.showLoading();
+                        }
+                    })
                     attendance(result2.value, "checkAttendance");
                 }
             })

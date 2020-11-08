@@ -269,8 +269,8 @@ async function addAttendanceSummaryToSheet(spreadSheetId){
   var formulas = [
     ["={'Details'!A:A}", "Total Attendance", "Attendance Percentage"]
   ]
-  for (i of Array(200).keys()) {
-    formulas.push(["", `=IF(SUM({Details!B${i+2}:${i+2}}) = 0; ""; SUM({Details!B${i+2}:${i+2}}))`, `=IF(COUNT({Details!B${i+2}:${i+2}}) = 0; ""; B${i+2}/COUNT({Details!B${i+2}:${i+2}}))`])
+  for (i = 2; i < 200; i++) {
+    formulas.push(["", `=IF(SUM({Details!B${i}:${i}}) = 0; ""; SUM({Details!B${i}:${i}}))`, `=IF(COUNT({Details!B${i}:${i}}) = 0; ""; B${i}/COUNT({Details!B${i}:${i}}))`])
   }
 
   gapi.client.sheets.spreadsheets.values.update({
