@@ -99,33 +99,31 @@ function showAttendanceModal(courses){
         denyButtonText: 'New Course',
         denyButtonColor: 'LightSeaGreen'
     }).then((result) => {
-        console.log(result);
         //Take attendance
         if (result.isConfirmed) {
-            attendance(courses[result.value], result.value, "attendance");
+            attendance(courses[result.value], "attendance", result.value);
         }
         //Modal to create new course
         else if (result.isDenied) {
-        Swal.fire({
-            title: 'Create a new course list',
-            input: 'text',
-            inputPlaceholder: 'Type your course name here...',
-            inputAttributes: {
-                'aria-label': 'Type your course name here'
-            },
-            showCancelButton: true
-            }).then((result2) => {
-            //Take attendance
-            if (result2.isConfirmed) {
-                console.log(result2.value)
-                attendance(result2.value, "checkAttendance");
-            }
-            })
+            Swal.fire({
+                title: 'Create a new course list',
+                input: 'text',
+                inputPlaceholder: 'Type your course name here...',
+                inputAttributes: {
+                    'aria-label': 'Type your course name here'
+                },
+                showCancelButton: true
+                }).then((result2) => {
+                //Take attendance
+                if (result2.isConfirmed) {
+                    attendance(result2.value, "checkAttendance");
+                }
+                })
         }
     })
 }
 
-function attendance(courseName, courseFolderId, method){
+function attendance(courseName, method, courseFolderId = null){
     //TODO: MEJORAR
     var participantIds = [];
     var participantNames = [];
@@ -133,7 +131,7 @@ function attendance(courseName, courseFolderId, method){
     element.scrollTop = element.scrollHeight;
 
     if (element.scrollTop != 0) {
-        var participantNames = scrollList(element, participantIds, participantNames, "attendance", courseName);
+        var participantNames = scrollList(element, participantIds, participantNames, method, courseName);
     }
     else {
         let values = collectParticipants(participantIds, participantNames);
@@ -169,7 +167,7 @@ function scrollList(element, participantIds, participantNames, type, courseName)
             setTimeout(function () {
                 console.log("Value is set to " + participantNames);
                 var data = {
-                    msg: method,
+                    msg: type,
                     names: participantNames,
                     ids: participantIds,
                     courseName: courseName,

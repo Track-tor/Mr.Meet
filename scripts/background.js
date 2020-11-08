@@ -146,7 +146,6 @@ chrome.extension.onMessage.addListener(
           }
           else{
             console.log('archivo ya existe');
-            console.log('Folder Id: ', response.result.files);
             chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
               console.log('Setted Folder Id: ', response.result.files[0].id);
             });
