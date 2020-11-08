@@ -20,14 +20,14 @@ function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names
   }).then(function(response) {
     switch(response.status){
       case 200:
-        var file = response.result;
-        if (!isCourseFolder){
-          chrome.storage.sync.set({mrmeetid: file.id}, function() {
-            console.log('Created Folder Id: ', file.id);
+        var folder = response.result;
+        if ((!isCourseFolder) && (courseFolderId == null)){
+          chrome.storage.sync.set({mrmeetid: folder.id}, function() {
+            console.log('Created Folder Id: ', folder.id);
           });
         }
         else{
-          passAttendance(names, courseFolderId);
+          passAttendance(folderName, names, folder.id);
         }
         break;
       default:
@@ -56,7 +56,7 @@ function checkAttendanceFolder(courseName, names, courseFolderId){
       }
       else{
         console.log("creating folder...");
-        createFolder(courseName, true, mrmeetid.mrmeetid, names, courseFolderId);
+        createFolder(courseName, true, mrmeetid.mrmeetid, names);
       }
 
     });

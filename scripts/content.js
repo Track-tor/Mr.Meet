@@ -118,7 +118,7 @@ function showAttendanceModal(courses){
                 if (result2.isConfirmed) {
                     attendance(result2.value, "checkAttendance");
                 }
-                })
+            })
         }
     })
 }
@@ -130,9 +130,11 @@ function attendance(courseName, method, courseFolderId = null){
     var element = document.querySelector('[role="tabpanel"]')
     element.scrollTop = element.scrollHeight;
 
+    //the panel is scrolleable
     if (element.scrollTop != 0) {
         var participantNames = scrollList(element, participantIds, participantNames, method, courseName);
     }
+    //the panel is not scrolleable
     else {
         let values = collectParticipants(participantIds, participantNames);
         participantIds = values[0];
@@ -146,6 +148,7 @@ function attendance(courseName, method, courseFolderId = null){
             courseFolderId: courseFolderId,
             meet_id: window.location.href.split('/').pop()
         }
+        //send message to background
         chrome.runtime.sendMessage(data);
     }
 }
