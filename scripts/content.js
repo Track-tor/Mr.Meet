@@ -16,6 +16,29 @@ chrome.extension.onMessage.addListener(
             //console.log(request.courses);
             showAttendanceModal(request.courses);
         }
+        else if (request.msg == "error") {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong, please try again',
+                showConfirmButton: false,
+                timer: 1500
+              })
+        }
+        else if (request.msg == "attendanceSuccessful") {
+              Swal.fire({
+                title: 'Attendance taken successfully',
+                text: "Do you want to open it?",
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: 'Open'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAttendance, "_blank",);
+              }
+            })
+        }
 
     }
 );
@@ -97,10 +120,19 @@ function showAttendanceModal(courses){
         confirmButtonText: 'Take Attendance',
         cancelButtonText: 'Cancel',
         denyButtonText: 'New Course',
-        denyButtonColor: 'LightSeaGreen'
+        denyButtonColor: 'LightSeaGreen',
+        inputValidator: (value) => {
+            return new Promise((resolve) => {
+              if (value) {
+                resolve()
+              } else {
+                resolve('You need to select a course')
+              }
+            })
+        }
     }).then((result) => {
         //Take attendance
-        if (result.isConfirmed) {
+        if (result.isConfirmed && result.value) {
             attendance(courses[result.value], "attendance", result.value);
         }
         //Modal to create new course

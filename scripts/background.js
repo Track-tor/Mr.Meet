@@ -179,6 +179,20 @@ async function addColumnToSheet(names, sheetId){
     values: newContent,
     range: 'A1',
     }).then(function(response) {
+      switch(response.status){
+        case 200:
+          console.log("list added to spreadsheet successfully")
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "attendanceSuccessful", spreadSheetIdAttendance: sheetId});
+          });
+          break;
+        default:
+          //send error to content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error"});
+          });
+          break;
+      }
         // console.log('update last: ' + window.LAST);
     });
 }
