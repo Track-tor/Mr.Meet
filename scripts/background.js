@@ -64,9 +64,6 @@ function checkAttendanceFolder(courseName, names, courseFolderId){
 }
 
 function passAttendance(courseName, names, courseFolderId){
-  console.log(courseName);
-  console.log(names);
-  console.log(courseFolderId);
 
   gapi.client.drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
@@ -87,7 +84,7 @@ function passAttendance(courseName, names, courseFolderId){
     else{
       console.log("creating attendance sheet...");
       var sheetId = await createSheet(courseName, courseFolderId);
-      console.log("sheet id:",sheetId)
+      //console.log("sheet id:",sheetId)
       addColumnToSheet(names, sheetId);
     }
   });
@@ -102,7 +99,7 @@ async function createSheet(courseName, courseFolderId){
   var sheetId = await gapi.client.drive.files.create({
     'resource': body
   }).then((response) => {
-    console.log("RESPONSE",response);
+    //console.log("RESPONSE",response);
     switch(response.status){
       case 200:
         return response.result.id
@@ -116,17 +113,74 @@ async function createSheet(courseName, courseFolderId){
 
 
 function readSheet(sheetId){
-  gapi.client.sheets.spreadsheets.values.get({
+  var content = gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
     range: 'A1:Z1000'
-  }).then((response) => {
-    console.log(response.result);
+  }).then(async(response) => {
+    switch(response.status){
+      case 200:
+        return response.result.values
+      default:
+        console.log('Error reading the spreadsheet, '+response);
+        break;
+    }
   });
+  return content
+}
+
+function manageAttendanceSheetContent(content, names) {
+  //if doesnt have content add first column
+  if (content == undefined) {
+    var content = [["Name"]]
+    for (name of names) {
+      content.push([name])
+    }
+  }
+  //proceed to add attendance row
+  //add date to first row
+  var now = new Date()
+  var date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
+  content[0].push(date)
+  for (i = 1; i < content.length; i++) {
+    if (names.includes(content[i][0])) {
+      //if the name is already in the spreadsheet
+      //remove the name from names list
+      names.splice(names.indexOf(content[i][0]))
+
+      //add a 1 to the end of this row
+      content[i].push("1")
+    }
+    else{
+      //add a 0 to the end of this row
+      content[i].push("0")
+    }
+  }
+  //add the new names to the content
+  for (name of names) {
+    var newRow = Array(content[0].length-1).fill("0")
+    //add name in he beginning
+    newRow.unshift(name);
+    //add a 1 to the end
+    newRow.push("1")
+    //add the new row to the end of the content
+    content.push(newRow)
+  }
+  return content
 }
 
 
-function addColumnToSheet(names, sheetId){
-  readSheet(sheetId);
+async function addColumnToSheet(names, sheetId){
+  var content = await readSheet(sheetId);
+  var newContent = manageAttendanceSheetContent(content, names)
+
+  gapi.client.sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    valueInputOption: 'USER_ENTERED',
+    values: newContent,
+    range: 'A1',
+    }).then(function(response) {
+        // console.log('update last: ' + window.LAST);
+    });
 }
 
 //listeners for communication

@@ -9,11 +9,11 @@ chrome.extension.onMessage.addListener(
             interval = setInterval(addLayout, 1000);
         }
         else if(request.msg == "stop"){
-            console.log("stop!");
+            console.log("Stop!");
             clearInterval(interval);
         }
         else if (request.msg == "sendCourses"){
-            console.log(request.courses);
+            //console.log(request.courses);
             showAttendanceModal(request.courses);
         }
 
@@ -139,7 +139,7 @@ function attendance(courseName, method, courseFolderId = null){
         let values = collectParticipants(participantIds, participantNames);
         participantIds = values[0];
         participantNames = values[1];
-        console.log(participantNames);
+        //console.log(participantNames);
         var data = {
             msg: method,
             names: participantNames,
