@@ -42,21 +42,28 @@ function checkAttendanceFolder(courseName, names, courseFolderId){
     gapi.client.drive.files.list({
       q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
     }).then( function(response) {
-      var exists = false
-      for (let element of response.result.files){
-        if(element.name == courseName){
-          exists = true;
+      switch(response.status){
+        case 200:
+          var exists = false
+          for (let element of response.result.files){
+            if(element.name == courseName){
+              exists = true;
+              break;
+            }
+          }
+          if(exists){
+            console.log("course folder exists...");
+            //TODO: hacer un dialog en content para mostrar que ya existe el curso
+            passAttendance(courseName, names, courseFolderId);
+          }
+          else{
+            console.log("creating folder...");
+            createFolder(courseName, true, mrmeetid.mrmeetid, names);
+          }
           break;
-        }
-      }
-      if(exists){
-        console.log("course folder exists...");
-        //TODO: hacer un dialog en content para mostrar que ya existe el curso
-        passAttendance(courseName, names, courseFolderId);
-      }
-      else{
-        console.log("creating folder...");
-        createFolder(courseName, true, mrmeetid.mrmeetid, names);
+        default:
+          console.log('Error checking couse folder, '+response);
+          break;
       }
 
     });
@@ -64,29 +71,36 @@ function checkAttendanceFolder(courseName, names, courseFolderId){
 }
 
 function passAttendance(courseName, names, courseFolderId){
-
   gapi.client.drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
   }).then(async function(response) {
-    var exists = false;
-    var sheet;
-    for (let element of response.result.files){
-      if(element.name == courseName+" Attendance"){
-        exists = true;
-        sheet = element
+    switch(response.status){
+      case 200:
+        var exists = false;
+        var sheet;
+        for (let element of response.result.files){
+          if(element.name == courseName+" Attendance"){
+            exists = true;
+            sheet = element
+            break;
+          }
+        }
+        if(exists){
+          console.log("attendance sheet exists...");
+          addColumnToSheet(names, sheet.id);
+        }
+        else{
+          console.log("creating attendance sheet...");
+          var sheetId = await createSheet(courseName, courseFolderId);
+          //console.log("sheet id:",sheetId)
+          addColumnToSheet(names, sheetId);
+        }
         break;
-      }
+      default:
+        console.log('Error taking attendance, '+response);
+        break;
     }
-    if(exists){
-      console.log("attendance sheet exists...");
-      addColumnToSheet(names, sheet.id);
-    }
-    else{
-      console.log("creating attendance sheet...");
-      var sheetId = await createSheet(courseName, courseFolderId);
-      //console.log("sheet id:",sheetId)
-      addColumnToSheet(names, sheetId);
-    }
+
   });
 }
 
@@ -168,7 +182,6 @@ function manageAttendanceSheetContent(content, names) {
   return content
 }
 
-
 async function addColumnToSheet(names, sheetId){
   var content = await readSheet(sheetId);
   var newContent = manageAttendanceSheetContent(content, names)
@@ -182,11 +195,13 @@ async function addColumnToSheet(names, sheetId){
       switch(response.status){
         case 200:
           console.log("list added to spreadsheet successfully")
+          //send message to content script to show success modal
           chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {msg: "attendanceSuccessful", spreadSheetIdAttendance: sheetId});
           });
           break;
         default:
+          console.log('Error updating data in spreadsheet, '+response);
           //send error to content script
           chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {msg: "error"});
@@ -202,18 +217,21 @@ chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.msg == "initializeApi"){
       chrome.storage.sync.get(['token'], function (token) {
+        //set token in api
         gapi.auth.setToken({
           'access_token': token.token
         })
+        //create Mr Meet root folder
         gapi.client.drive.files.list({
           q: "name='Mr Meet'"
         }).then( function(response) {
           if (response.result.files.length == 0) {
-            console.log('archivo no existe');
+            console.log('carpeta Mr Meet no existe');
             createFolder("Mr Meet");
           }
           else{
-            console.log('archivo ya existe');
+            console.log('carpeta Mr Meet ya existe');
+            //set the id of the folder in storage
             chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
               console.log('Setted Folder Id: ', response.result.files[0].id);
             });
@@ -239,6 +257,7 @@ chrome.extension.onMessage.addListener(
           q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
         }).then( function(response) {
           var courseNames = {};
+          //save id and name of courses folders in a dictionary and send it to content script
           for (let element of response.result.files){
             courseNames[element.id] = element.name;
           }

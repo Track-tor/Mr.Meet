@@ -5,7 +5,7 @@ chrome.extension.onMessage.addListener(
     async function(request, sender, sendResponse) {
         if (request.msg == "start"){
             console.log("Start!");
-            sendMessage("initializeApi");//intitializes api token and sets the Mr meet folder in drive
+            chrome.runtime.sendMessage({msg: 'initializeApi'});//intitializes api token and sets the Mr meet folder in drive
             interval = setInterval(addLayout, 1000);
         }
         else if(request.msg == "stop"){
@@ -95,14 +95,6 @@ function addLayout(){
     }
 }
 
-//send a simple message between the components of the extension
-function sendMessage(message){
-    chrome.runtime.sendMessage({
-        msg: message
-    });
-}
-
-
 
 function getCourses(){
       chrome.runtime.sendMessage({msg: 'getCourses'});
@@ -144,7 +136,16 @@ function showAttendanceModal(courses){
                 inputAttributes: {
                     'aria-label': 'Type your course name here'
                 },
-                showCancelButton: true
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    return new Promise((resolve) => {
+                      if (Object.values(courses).includes(value)) {
+                        resolve('This course already exists')
+                      } else {
+                        resolve()
+                      }
+                    })
+                }
                 }).then((result2) => {
                 //Take attendance
                 if (result2.isConfirmed) {
@@ -169,19 +170,22 @@ function attendance(courseName, method, courseFolderId = null){
     //the panel is not scrolleable
     else {
         let values = collectParticipants(participantIds, participantNames);
-        participantIds = values[0];
-        participantNames = values[1];
-        //console.log(participantNames);
-        var data = {
-            msg: method,
-            names: participantNames,
-            ids: participantIds,
-            courseName: courseName,
-            courseFolderId: courseFolderId,
-            meet_id: window.location.href.split('/').pop()
+        //check if there are participants
+        if (values != undefined) {
+            participantIds = values[0];
+            participantNames = values[1];
+            //console.log(participantNames);
+            var data = {
+                msg: method,
+                names: participantNames,
+                ids: participantIds,
+                courseName: courseName,
+                courseFolderId: courseFolderId,
+                meet_id: window.location.href.split('/').pop()
+            }
+            //send message to background
+            chrome.runtime.sendMessage(data);
         }
-        //send message to background
-        chrome.runtime.sendMessage(data);
     }
 }
 
