@@ -51,6 +51,7 @@ function checkAttendanceFolder(courseName, names, courseFolderId){
       }
       if(exists){
         console.log("course folder exists...");
+        //TODO: hacer un dialog en content para mostrar que ya existe el curso
         passAttendance(courseName, names, courseFolderId);
       }
       else{
@@ -69,48 +70,63 @@ function passAttendance(courseName, names, courseFolderId){
 
   gapi.client.drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
-  }).then(function(response) {
-    var exists = false
+  }).then(async function(response) {
+    var exists = false;
+    var sheet;
     for (let element of response.result.files){
       if(element.name == courseName+" Attendance"){
         exists = true;
+        sheet = element
         break;
       }
     }
     if(exists){
       console.log("attendance sheet exists...");
-      addColumnToSheet();
-      
+      addColumnToSheet(names, sheet.id);
     }
     else{
       console.log("creating attendance sheet...");
-      createSheet(courseName, courseFolderId);
-      addColumnToSheet();
+      var sheetId = await createSheet(courseName, courseFolderId);
+      console.log("sheet id:",sheetId)
+      addColumnToSheet(names, sheetId);
     }
   });
 }
 
-function createSheet(courseName, courseFolderId){
+async function createSheet(courseName, courseFolderId){
   var body = {
     'parents': [courseFolderId], 
     'name': courseName+" Attendance",
     'mimeType': "application/vnd.google-apps.spreadsheet"
   };
-  gapi.client.drive.files.create({
+  var sheetId = await gapi.client.drive.files.create({
     'resource': body
   }).then((response) => {
-    if(response.ok){
-      console.log(response.result.id);
+    console.log("RESPONSE",response);
+    switch(response.status){
+      case 200:
+        return response.result.id
+      default:
+        console.log('Error creating the spreadsheet, '+response);
+        break;
     }
-    else{
-      //TODO: implementar manejo de errores
-    }
+  });
+  return sheetId
+}
+
+
+function readSheet(names, sheetId){
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: 'A1:Z1000'
+  }).then((response) => {
+    console.log(response.result);
   });
 }
 
 
-function addColumnToSheet(){
-
+function addColumnToSheet(names, sheetId){
+  readSheet(names, sheetId);
 }
 
 //listeners for communication
@@ -134,8 +150,11 @@ chrome.extension.onMessage.addListener(
         });
       })
     }
-    else if (request.msg == "attendance"){
+    else if (request.msg == "checkAttendance"){
       checkAttendanceFolder(request.courseName, request.names, request.courseFolderId);
+    }
+    else if (request.msg == "attendance"){
+      passAttendance(request.courseName, request.names, request.courseFolderId);
     }
     else if (request.msg == 'question'){
       //questions

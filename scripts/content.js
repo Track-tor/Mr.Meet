@@ -102,7 +102,7 @@ function showAttendanceModal(courses){
         console.log(result);
         //Take attendance
         if (result.isConfirmed) {
-            attendance(courses[result.value], result.value);
+            attendance(courses[result.value], result.value, "attendance");
         }
         //Modal to create new course
         else if (result.isDenied) {
@@ -118,14 +118,14 @@ function showAttendanceModal(courses){
             //Take attendance
             if (result2.isConfirmed) {
                 console.log(result2.value)
-                attendance(result2.value);
+                attendance(result2.value, "checkAttendance");
             }
             })
         }
     })
 }
 
-function attendance(courseName, courseFolderId){
+function attendance(courseName, courseFolderId, method){
     //TODO: MEJORAR
     var participantIds = [];
     var participantNames = [];
@@ -141,7 +141,7 @@ function attendance(courseName, courseFolderId){
         participantNames = values[1];
         console.log(participantNames);
         var data = {
-            msg: 'attendance',
+            msg: method,
             names: participantNames,
             ids: participantIds,
             courseName: courseName,
@@ -169,7 +169,7 @@ function scrollList(element, participantIds, participantNames, type, courseName)
             setTimeout(function () {
                 console.log("Value is set to " + participantNames);
                 var data = {
-                    msg: 'attendance',
+                    msg: method,
                     names: participantNames,
                     ids: participantIds,
                     courseName: courseName,
