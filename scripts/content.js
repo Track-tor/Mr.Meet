@@ -4,7 +4,7 @@
  chrome.storage.sync.get(['key'], function (result) {
     if (result.key) {
         chrome.runtime.sendMessage({msg: 'initializeApi'});//intitializes api token and sets the Mr meet folder in drive
-        interval = setInterval(addLayout, 1000);
+        interval = setInterval(addLayout, 500);
     }
  });
 
@@ -12,10 +12,13 @@ chrome.extension.onMessage.addListener(
     async function(request, sender, sendResponse) {
         if (request.msg == "start"){
             chrome.runtime.sendMessage({msg: 'initializeApi'});//intitializes api token and sets the Mr meet folder in drive
-            interval = setInterval(addLayout, 1000);
+            interval = setInterval(addLayout, 500);
         }
         else if(request.msg == "stop"){
             clearInterval(interval);
+            if (document.querySelector('#extraBoard')) {
+                document.querySelector('#extraBoard').remove()
+            }
         }
         else if (request.msg == "sendCourses"){
             //console.log(request.courses);
@@ -53,50 +56,35 @@ function addLayout(){
     let sidePanel = document.querySelector('div[jsname="Kzha2e"]');// obtener el tablero con botones del panel derecho
     
     if(sidePanel){
-        clearInterval(interval);
 
-        let muteAllButton = document.createElement("span");//creamos una division dentro del tablero
-        muteAllButton.setAttribute("jscontroller","eqDgk");
+        if (!document.querySelector('#extraBoard')) {
+            //Creamos un tablero de botones extra, para las funcionalidades no locales
+            let extraBoard = document.createElement("div");
+            extraBoard.setAttribute("id","extraBoard");
+            extraBoard.setAttribute("class","uFGEzd");
 
-        muteAllButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
-        <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
-            <span jsslot="" class="l4V7wb Fxmcue">
-                <span class="NPEfkd RveJvd snByac">
-                    <div class="is878e">
-                        <img src="${chrome.runtime.getURL('res/mute.svg')}" width="20">
-                    </div>
-                    <div class="GdrRqd">mute all</div>
+            //ATTENDANCE BUTTON
+            let attendanceButton = document.createElement("span");//creamos una division dentro del tablero
+            attendanceButton.setAttribute("jscontroller","eqDgk");
+        
+            attendanceButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
+                <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
+                <span jsslot="" class="l4V7wb Fxmcue">
+                    <span class="NPEfkd RveJvd snByac">
+                        <div class="is878e">
+                            <img src="${chrome.runtime.getURL('res/attendance.svg')}" width="20">
+                        </div>
+                        <div class="GdrRqd">Attendance</div>
+                    </span>
                 </span>
-            </span>
-        </div>`;//le asignamos un formato en HTML
-        muteAllButton.addEventListener("click",() => {muteAllMembers();});//le agregamos la funcionalidad de mutear a todos los usuarios
-        sidePanel.insertBefore(muteAllButton,null);//insertar el boton en el tablero
+            </div>`;//le asignamos un formato en HTML
 
+            attendanceButton.addEventListener("click",() => {getCourses();});//le agregamos la funcion de tomar asistencia
+            extraBoard.insertBefore(attendanceButton,null);//insertar el boton en el tablero extra
 
-        //Creamos un tablero de botones extra, para las funcionalidades no locales
-        let extraBoard = document.createElement("div");
-        extraBoard.setAttribute("class","uFGEzd");
+            sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
+        }
 
-        //ATTENDANCE BUTTON
-        let attendanceButton = document.createElement("span");//creamos una division dentro del tablero
-        attendanceButton.setAttribute("jscontroller","eqDgk");
-    
-        attendanceButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
-            <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
-            <span jsslot="" class="l4V7wb Fxmcue">
-                <span class="NPEfkd RveJvd snByac">
-                    <div class="is878e">
-                        <img src="${chrome.runtime.getURL('res/attendance.svg')}" width="20">
-                    </div>
-                    <div class="GdrRqd">Attendance</div>
-                </span>
-            </span>
-        </div>`;//le asignamos un formato en HTML
-
-        attendanceButton.addEventListener("click",() => {getCourses();});//le agregamos la funcion de tomar asistencia
-        extraBoard.insertBefore(attendanceButton,null);//insertar el boton en el tablero extra
-
-        sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
     }
 }
 
@@ -138,7 +126,7 @@ function showAttendanceModal(courses){
                     Swal.showLoading();
                 }
             })
-            attendance(courses[result.value], "attendance", result.value);
+            attendance(courses[result.value], result.value);
         }
         //Modal to create new course
         else if (result.isDenied) {
@@ -170,14 +158,14 @@ function showAttendanceModal(courses){
                             Swal.showLoading();
                         }
                     })
-                    attendance(result2.value, "checkAttendance");
+                    attendance(result2.value);
                 }
             })
         }
     })
 }
 
-function attendance(courseName, method, courseFolderId = null){
+function attendance(courseName, courseFolderId = null){
     //TODO: MEJORAR
     var participantIds = [];
     var participantNames = [];
@@ -186,7 +174,7 @@ function attendance(courseName, method, courseFolderId = null){
 
     //the panel is scrolleable
     if (element.scrollTop != 0) {
-        var participantNames = scrollList(element, participantIds, participantNames, method, courseName);
+        var participantNames = scrollList(element, participantIds, participantNames, courseName);
     }
     //the panel is not scrolleable
     else {
@@ -197,7 +185,7 @@ function attendance(courseName, method, courseFolderId = null){
             participantNames = values[1];
             //console.log(participantNames);
             var data = {
-                msg: method,
+                msg: "attendance",
                 names: participantNames,
                 ids: participantIds,
                 courseName: courseName,
@@ -210,7 +198,7 @@ function attendance(courseName, method, courseFolderId = null){
     }
 }
 
-function scrollList(element, participantIds, participantNames, type, courseName) {
+function scrollList(element, participantIds, participantNames, courseName) {
     var num = element.scrollTop
     function scroll(n) {
         element.scrollTop = n
@@ -227,7 +215,7 @@ function scrollList(element, participantIds, participantNames, type, courseName)
             setTimeout(function () {
                 console.log("Value is set to " + participantNames);
                 var data = {
-                    msg: type,
+                    msg: "attendance",
                     names: participantNames,
                     ids: participantIds,
                     courseName: courseName,

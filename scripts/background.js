@@ -41,42 +41,7 @@ function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names
   });
 }
 
-function checkAttendanceFolder(courseName, names, courseFolderId){
-  chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
-    gapi.client.drive.files.list({
-      q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
-    }).then( function(response) {
-      switch(response.status){
-        case 200:
-          var exists = false
-          for (let element of response.result.files){
-            if(element.name == courseName){
-              exists = true;
-              break;
-            }
-          }
-          if(exists){
-            console.log("course folder exists...");
-            //TODO: hacer un dialog en content para mostrar que ya existe el curso
-            passAttendance(courseName, names, courseFolderId);
-          }
-          else{
-            console.log("creating folder...");
-            createFolder(courseName, true, mrmeetid.mrmeetid, names);
-          }
-          break;
-        default:
-          console.log('Error checking course folder, '+response);
-          //send error to content script
-          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error checking course folder"});
-          });
-          break;
-      }
 
-    });
-  });
-}
 
 function passAttendance(courseName, names, courseFolderId){
   gapi.client.drive.files.list({
@@ -95,7 +60,6 @@ function passAttendance(courseName, names, courseFolderId){
         }
         if(exists){
           console.log("attendance sheet exists...");
-          console.log(sheet)
           addAttendanceDetailToSheet(names, sheet.id);
         }
         else{
@@ -307,25 +271,43 @@ chrome.extension.onMessage.addListener(
         gapi.client.drive.files.list({
           q: "name='Mr Meet'"
         }).then( function(response) {
-          if (response.result.files.length == 0) {
-            console.log('carpeta Mr Meet no existe');
-            createFolder("Mr Meet");
+          switch(response.status){
+            case 200:
+              if (response.result.files.length == 0) {
+                console.log('carpeta Mr Meet no existe');
+                createFolder("Mr Meet");
+              }
+              else{
+                console.log('carpeta Mr Meet ya existe');
+                //set the id of the folder in storage
+                chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
+                  console.log('Setted Folder Id: ', response.result.files[0].id);
+                });
+              }
+              break;
+            default:
+              console.log('Error initializing gapi, '+response);
+              //send error to content script
+              chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error initializing gapi"});
+              });
+              break;
           }
-          else{
-            console.log('carpeta Mr Meet ya existe');
-            //set the id of the folder in storage
-            chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
-              console.log('Setted Folder Id: ', response.result.files[0].id);
-            });
-          }
+
+
         });
       })
     }
-    else if (request.msg == "checkAttendance"){
-      checkAttendanceFolder(request.courseName, request.names, request.courseFolderId);
-    }
     else if (request.msg == "attendance"){
-      passAttendance(request.courseName, request.names, request.courseFolderId);
+      //if is a new course
+      if (request.courseFolderId == null) {
+        chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
+          createFolder(request.courseName, true, mrmeetid.mrmeetid, request.names);
+        })
+      }
+      else {
+        passAttendance(request.courseName, request.names, request.courseFolderId);
+      }
     }
     else if (request.msg == 'question'){
       //questions
@@ -338,14 +320,26 @@ chrome.extension.onMessage.addListener(
         gapi.client.drive.files.list({
           q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
         }).then( function(response) {
-          var courseNames = {};
-          //save id and name of courses folders in a dictionary and send it to content script
-          for (let element of response.result.files){
-            courseNames[element.id] = element.name;
+          switch(response.status){
+            case 200:
+              var courseNames = {};
+              //save id and name of courses folders in a dictionary and send it to content script
+              for (let element of response.result.files){
+                courseNames[element.id] = element.name;
+              }
+              chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCourses", courses: courseNames});
+              });
+              break;
+            default:
+              console.log('Error getting courses, ');
+              console.log(response)
+              //send error to content script
+              chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error getting courses"});
+              });
+              break;
           }
-          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCourses", courses: courseNames});
-          });
         });
       });
     }
