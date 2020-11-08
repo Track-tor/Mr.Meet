@@ -115,7 +115,7 @@ async function createSheet(courseName, courseFolderId){
 }
 
 
-function readSheet(names, sheetId){
+function readSheet(sheetId){
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
     range: 'A1:Z1000'
@@ -126,7 +126,7 @@ function readSheet(names, sheetId){
 
 
 function addColumnToSheet(names, sheetId){
-  readSheet(names, sheetId);
+  readSheet(sheetId);
 }
 
 //listeners for communication
@@ -146,6 +146,10 @@ chrome.extension.onMessage.addListener(
           }
           else{
             console.log('archivo ya existe');
+            console.log('Folder Id: ', response.result.files);
+            chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
+              console.log('Setted Folder Id: ', response.result.files[0].id);
+            });
           }
         });
       })
