@@ -103,6 +103,7 @@ function passAttendance(courseName, names, courseFolderId){
           var spreadSheetId = await createSpreadSheet(courseName, courseFolderId);
           var sheetDetails = await addSheet(spreadSheetId, "Details");
           var sheetSummary = await addSheet(spreadSheetId, "Summary");
+          await addAttendanceSummaryToSheet(spreadSheetId)
           //console.log("sheet id:",spreadSheetId)
           addAttendanceDetailToSheet(names, spreadSheetId);
         }
@@ -258,6 +259,35 @@ async function addAttendanceDetailToSheet(names, spreadSheetId){
           //send error to content script
           chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error updating data in spreadsheet"});
+          });
+          break;
+      }
+    });
+}
+
+async function addAttendanceSummaryToSheet(spreadSheetId){
+  var formulas = [
+    ["={'Details'!A:A}", "Total Attendance", "Attendance Percentage"]
+  ]
+  for (i of Array(200).keys()) {
+    formulas.push(["", `=IF(SUM({Details!B${i+2}:${i+2}}) = 0; ""; SUM({Details!B${i+2}:${i+2}}))`, `=IF(COUNT({Details!B${i+2}:${i+2}}) = 0; ""; B${i+2}/COUNT({Details!B${i+2}:${i+2}}))`])
+  }
+
+  gapi.client.sheets.spreadsheets.values.update({
+    spreadsheetId: spreadSheetId,
+    valueInputOption: 'USER_ENTERED',
+    values: formulas,
+    range: 'Summary!A1',
+    }).then(function(response) {
+      switch(response.status){
+        case 200:
+          console.log("summary formulas added to spreadsheet successfully")
+          break;
+        default:
+          console.log('Error updating summary formulas in spreadsheet, '+response);
+          //send error to content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error updating summary formulas in spreadsheet"});
           });
           break;
       }
