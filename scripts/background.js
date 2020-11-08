@@ -100,9 +100,11 @@ function passAttendance(courseName, names, courseFolderId){
         }
         else{
           console.log("creating attendance sheet...");
-          var sheetId = await createSheet(courseName, courseFolderId);
-          //console.log("sheet id:",sheetId)
-          addAttendanceDetailToSheet(names, sheetId);
+          var spreadSheetId = await createSpreadSheet(courseName, courseFolderId);
+          var sheetDetails = await addSheet(spreadSheetId, "Details");
+          var sheetSummary = await addSheet(spreadSheetId, "Summary");
+          //console.log("sheet id:",spreadSheetId)
+          addAttendanceDetailToSheet(names, spreadSheetId);
         }
         break;
       default:
@@ -117,13 +119,13 @@ function passAttendance(courseName, names, courseFolderId){
   });
 }
 
-async function createSheet(courseName, courseFolderId){
+async function createSpreadSheet(courseName, courseFolderId){
   var body = {
     'parents': [courseFolderId], 
     'name': courseName+" Attendance",
     'mimeType': "application/vnd.google-apps.spreadsheet"
   };
-  var sheetId = await gapi.client.drive.files.create({
+  var spreadSheetId = await gapi.client.drive.files.create({
     'resource': body
   }).then((response) => {
     //console.log("RESPONSE",response);
@@ -140,14 +142,43 @@ async function createSheet(courseName, courseFolderId){
         break;
     }
   });
-  return sheetId
+  return spreadSheetId
+}
+
+async function addSheet(spreadSheetId, title) {
+  var body = {
+    addSheet: {
+      properties: {
+        title: title,
+        index: 0
+      }
+    }
+  };
+  var reply = gapi.client.sheets.spreadsheets.batchUpdate({
+    spreadsheetId: spreadSheetId,
+    requests: body
+    }).then((response) => {
+      switch(response.status){
+        case 200:
+          console.log(response.result)
+          return response.replies
+        default:
+          console.log('Error adding the sheet, '+response);
+          //send error to content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error adding the sheet"});
+          });
+          break;
+        }
+    })
+    return reply
 }
 
 
-function readSheet(sheetId){
+function readSheet(spreadSheetId, sheetName){
   var content = gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: 'A1:Z1000'
+    spreadsheetId: spreadSheetId,
+    range: sheetName+'!A1:Z1000'
   }).then(async(response) => {
     switch(response.status){
       case 200:
@@ -181,7 +212,7 @@ function manageAttendanceSheetContent(content, names) {
     if (names.includes(content[i][0])) {
       //if the name is already in the spreadsheet
       //remove the name from names list
-      names.splice(names.indexOf(content[i][0]))
+      names.splice(names.indexOf(content[i][0]), 1)
 
       //add a 1 to the end of this row
       content[i].push("1")
@@ -193,7 +224,7 @@ function manageAttendanceSheetContent(content, names) {
   }
   //add the new names to the content
   for (name of names) {
-    var newRow = Array(content[0].length-1).fill("0")
+    var newRow = Array(content[0].length-2).fill("0")
     //add name in he beginning
     newRow.unshift(name);
     //add a 1 to the end
@@ -204,22 +235,22 @@ function manageAttendanceSheetContent(content, names) {
   return content
 }
 
-async function addAttendanceDetailToSheet(names, sheetId){
-  var content = await readSheet(sheetId);
+async function addAttendanceDetailToSheet(names, spreadSheetId){
+  var content = await readSheet(spreadSheetId, "Details");
   var newContent = manageAttendanceSheetContent(content, names)
 
   gapi.client.sheets.spreadsheets.values.update({
-    spreadsheetId: sheetId,
+    spreadsheetId: spreadSheetId,
     valueInputOption: 'USER_ENTERED',
     values: newContent,
-    range: 'A1',
+    range: 'Details!A1',
     }).then(function(response) {
       switch(response.status){
         case 200:
           console.log("list added to spreadsheet successfully")
           //send message to content script to show success modal
           chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {msg: "attendanceSuccessful", spreadSheetIdAttendance: sheetId});
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "attendanceSuccessful", spreadSheetIdAttendance: spreadSheetId});
           });
           break;
         default:
