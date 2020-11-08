@@ -95,13 +95,14 @@ function passAttendance(courseName, names, courseFolderId){
         }
         if(exists){
           console.log("attendance sheet exists...");
-          addColumnToSheet(names, sheet.id);
+          console.log(sheet)
+          addAttendanceDetailToSheet(names, sheet.id);
         }
         else{
           console.log("creating attendance sheet...");
           var sheetId = await createSheet(courseName, courseFolderId);
           //console.log("sheet id:",sheetId)
-          addColumnToSheet(names, sheetId);
+          addAttendanceDetailToSheet(names, sheetId);
         }
         break;
       default:
@@ -128,6 +129,7 @@ async function createSheet(courseName, courseFolderId){
     //console.log("RESPONSE",response);
     switch(response.status){
       case 200:
+        console.log(response.result)
         return response.result.id
       default:
         console.log('Error creating the spreadsheet, '+response);
@@ -202,7 +204,7 @@ function manageAttendanceSheetContent(content, names) {
   return content
 }
 
-async function addColumnToSheet(names, sheetId){
+async function addAttendanceDetailToSheet(names, sheetId){
   var content = await readSheet(sheetId);
   var newContent = manageAttendanceSheetContent(content, names)
 
@@ -228,7 +230,6 @@ async function addColumnToSheet(names, sheetId){
           });
           break;
       }
-        // console.log('update last: ' + window.LAST);
     });
 }
 
