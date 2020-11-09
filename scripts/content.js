@@ -197,7 +197,6 @@ function attendance(courseName, courseFolderId = null){
         }
         //there are not participants in the meet
         else {
-            Swal.close();
             Swal.fire({
                 icon: 'info',
                 title: 'Something went wrong',
@@ -257,14 +256,10 @@ function collectParticipants(participantIds, participantNames) {
         if (!participantIds.includes(pid) && pid != null) {
             var name = div.querySelector('[data-self-name]')
             if (name) {
-            if (!(
-                name.innerHTML == "Tú" ||
-                name.innerHTML == "You"
-            )) {
-                participantNames.push(name.innerHTML)
-                participantIds.push(pid)
-            }
-
+                if (!(name.innerHTML == "Tú" || name.innerHTML == "You" || name.innerHTML.includes("Presentación") || name.innerHTML.includes("Presentation"))) {
+                    participantNames.push(name.innerHTML)
+                    participantIds.push(pid)
+                }
             }
         }
         })
