@@ -195,6 +195,19 @@ function attendance(courseName, courseFolderId = null){
             //send message to background
             chrome.runtime.sendMessage(data);
         }
+        //there are not participants in the meet
+        else {
+            Swal.close();
+            Swal.fire({
+                icon: 'info',
+                title: 'Something went wrong',
+                text: "There are not participants in the meet",
+                showConfirmButton: true,
+                onOpen: () => {
+                    Swal.hideLoading();
+                }
+            })
+        }
     }
 }
 
