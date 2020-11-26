@@ -21,7 +21,6 @@ chrome.extension.onMessage.addListener(
             }
         }
         else if (request.msg == "sendCourses"){
-            //console.log(request.courses);
             showAttendanceModal(request.courses);
         }
         else if (request.msg == "error") {
@@ -47,7 +46,6 @@ chrome.extension.onMessage.addListener(
                 }
             })
         }
-
     }
 );
 
@@ -61,11 +59,10 @@ function addLayout(){
             //Creamos un tablero de botones extra, para las funcionalidades no locales
             let extraBoard = document.createElement("div");
             extraBoard.setAttribute("id","extraBoard");
-            extraBoard.setAttribute("class","uFGEzd");
+            extraBoard.setAttribute("class", "Lf3gob");
 
             //ATTENDANCE BUTTON
             let attendanceButton = document.createElement("div");//creamos una division dentro del tablero
-            attendanceButton.setAttribute("class", "Lf3gob");
         
             attendanceButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
                 <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
@@ -82,6 +79,24 @@ function addLayout(){
             attendanceButton.addEventListener("click",() => {getCourses();});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(attendanceButton,null);//insertar el boton en el tablero extra
 
+            //QUESTIONS BUTTON
+            let questionButton = document.createElement("div");//creamos una division dentro del tablero
+        
+            questionButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
+                <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
+                <span jsslot="" class="l4V7wb Fxmcue">
+                    <span class="NPEfkd RveJvd snByac">
+                        <div class="is878e">
+                            <img src="${chrome.runtime.getURL('res/question.svg')}" width="20">
+                        </div>
+                        <div class="GdrRqd">Attendance</div>
+                    </span>
+                </span>
+            </div>`;//le asignamos un formato en HTML
+
+            questionButton.addEventListener("click",() => {getQuestions();});//le agregamos la funcion de tomar asistencia
+            extraBoard.insertBefore(questionButton,null);//insertar el boton en el tablero extra
+
             sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
         }
 
@@ -90,7 +105,11 @@ function addLayout(){
 
 
 function getCourses(){
-      chrome.runtime.sendMessage({msg: 'getCourses'});
+    chrome.runtime.sendMessage({msg: 'getCourses'});
+}
+
+function getQuestions(){
+    chrome.runtime.sendMessage({msg: 'getCourses'});
 }
 
 
