@@ -64,8 +64,8 @@ function addLayout(){
             extraBoard.setAttribute("class","uFGEzd");
 
             //ATTENDANCE BUTTON
-            let attendanceButton = document.createElement("span");//creamos una division dentro del tablero
-            attendanceButton.setAttribute("jscontroller","eqDgk");
+            let attendanceButton = document.createElement("div");//creamos una division dentro del tablero
+            attendanceButton.setAttribute("class", "Lf3gob");
         
             attendanceButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
                 <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
@@ -247,19 +247,20 @@ function scrollList(element, participantIds, participantNames, courseName, cours
 
 
 function collectParticipants(participantIds, participantNames) {
-    if (document.querySelectorAll('[role=presentation]').length > 1) {
+    if (document.querySelectorAll('[role=listitem]').length > 1) {
 
-        var participantDivs = Array.from(document.querySelectorAll('[data-participant-id],[data-requested-participant-id]'));
+        var participantDivs = Array.from(document.querySelectorAll('[role=listitem]'));
 
         participantDivs.forEach((div) => {
         var pid = div.getAttribute("data-participant-id")
         if (pid != null) pid = pid.split('/')[3]
         if (!participantIds.includes(pid) && pid != null) {
-            var name = div.querySelector('[data-self-name]')
+            var name = div.querySelector('[class=ZjFb7c]')
             if (name) {
-                if (!(name.innerHTML == "Tú" || name.innerHTML == "You" || name.innerHTML.includes("Presentación") || name.innerHTML.includes("Presentation"))) {
-                    participantNames.push(name.innerHTML)
-                    participantIds.push(pid)
+                if (!(div.querySelector('[class=QMC9Zd]') || (div.querySelector('[class=jcGw9c]')))) {
+                    console.log(name.innerHTML);
+                    participantNames.push(name.innerHTML);
+                    participantIds.push(pid);
                 }
             }
         }
