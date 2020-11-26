@@ -20,8 +20,13 @@ chrome.extension.onMessage.addListener(
                 document.querySelector('#extraBoard').remove()
             }
         }
+        //si nos llegan los cursos para asistencia
         else if (request.msg == "sendCourses"){
             showAttendanceModal(request.courses);
+        }
+        //si nos llegan los cursos para asistencia
+        else if (request.msg == "sendCoursesForQuestions"){
+            selectCourseQuestionsModal(request.courses);
         }
         else if (request.msg == "error") {
             Swal.fire({
@@ -54,7 +59,6 @@ function addLayout(){
     let sidePanel = document.querySelector('div[jsname="Kzha2e"]');// obtener el tablero con botones del panel derecho
     
     if(sidePanel){
-
         if (!document.querySelector('#extraBoard')) {
             //Creamos un tablero de botones extra, para las funcionalidades no locales
             let extraBoard = document.createElement("div");
@@ -76,7 +80,7 @@ function addLayout(){
                 </span>
             </div>`;//le asignamos un formato en HTML
 
-            attendanceButton.addEventListener("click",() => {getCourses();});//le agregamos la funcion de tomar asistencia
+            attendanceButton.addEventListener("click",() => {getCourses('attendance');});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(attendanceButton,null);//insertar el boton en el tablero extra
 
             //QUESTIONS BUTTON
@@ -94,7 +98,7 @@ function addLayout(){
                 </span>
             </div>`;//le asignamos un formato en HTML
 
-            questionButton.addEventListener("click",() => {getQuestions();});//le agregamos la funcion de tomar asistencia
+            questionButton.addEventListener("click",() => {getCourses('questions');});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(questionButton,null);//insertar el boton en el tablero extra
 
             sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
@@ -103,15 +107,13 @@ function addLayout(){
     }
 }
 
-
-function getCourses(){
-    chrome.runtime.sendMessage({msg: 'getCourses'});
+// FUNCIONALIDAD DE ASISTENCIA
+function getCourses(type){
+    chrome.runtime.sendMessage({
+        msg: 'getCourses',
+        type: type
+    });
 }
-
-function getQuestions(){
-    chrome.runtime.sendMessage({msg: 'getCourses'});
-}
-
 
 function showAttendanceModal(courses){
     Swal.fire({
@@ -267,9 +269,7 @@ function scrollList(element, participantIds, participantNames, courseName, cours
 
 function collectParticipants(participantIds, participantNames) {
     if (document.querySelectorAll('[role=listitem]').length > 1) {
-
         var participantDivs = Array.from(document.querySelectorAll('[role=listitem]'));
-
         participantDivs.forEach((div) => {
         var pid = div.getAttribute("data-participant-id")
         if (pid != null) pid = pid.split('/')[3]
@@ -286,4 +286,49 @@ function collectParticipants(participantIds, participantNames) {
         })
         return [participantIds, participantNames]
     }
+}
+
+
+
+//FUNCIONALIDAD DE PREGUNTAS
+
+function selectCourseQuestionsModal(courses){
+    Swal.fire({
+        title: 'Select a Course',
+        input: 'select',
+        inputOptions: courses,
+        inputPlaceholder: 'Select a course',
+        showCancelButton: true,
+        confirmButtonText: 'Get Questions',
+        cancelButtonText: 'Cancel',
+        inputValidator: (value) => {
+            return new Promise((resolve) => {
+              if (value) {
+                resolve()
+              } else {
+                resolve('You need to select a course')
+              }
+            })
+        }
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            Swal.fire({
+                title: 'GettingQuestions',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                onOpen: () => {
+                    Swal.showLoading();
+                }
+            })
+            getQuestions(courses[result.value], result.value);
+        }
+    })
+}
+
+function getQuestions(courseName, courseFolderId){
+    chrome.runtime.sendMessage({
+        msg: 'getQuestions',
+        courseName: courseName,
+        courseFolderId: courseFolderId
+    });
 }

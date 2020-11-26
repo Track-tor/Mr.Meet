@@ -233,7 +233,7 @@ async function addAttendanceSummaryToSheet(spreadSheetId){
     ["={'Details'!A:A}", "Total Attendance", "Attendance Percentage"]
   ]
   for (i = 2; i < 200; i++) {
-    formulas.push(["", `=IF(SUM({Details!B${i}:${i}}) = 0; ""; SUM({Details!B${i}:${i}}))`, `=IF(COUNT({Details!B${i}:${i}}) = 0; ""; CONCATENATE(B${i}/COUNT({Details!B${i}:${i}})*100, "%"))`])
+    formulas.push(["", `=IF(SUM({Details!B${i}:${i}}) = 0; ""; SUM({Details!B${i}:${i}}))`, `=IF(COUNT({Details!B${i}:${i}}) = 0; ""; CONCATENATE(B${i}/COUNT({Details!B${i}:${i}})*100; "%"))`])
   }
 
   gapi.client.sheets.spreadsheets.values.update({
@@ -327,7 +327,13 @@ chrome.extension.onMessage.addListener(
                 courseNames[element.id] = element.name;
               }
               chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCourses", courses: courseNames});
+                if (request.type == 'attendance'){
+                  chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCourses", courses: courseNames});
+                }
+                else if(request.type == 'questions'){
+                  chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCoursesForQuestions", courses: courseNames});
+                }
+                
               });
               break;
             default:
@@ -341,6 +347,9 @@ chrome.extension.onMessage.addListener(
           }
         });
       });
+    }
+    else if (request.msg == "getQuestions"){
+      checkSheet(request.courseName ,request.courseFolderId);
     }
   }
 );
