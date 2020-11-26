@@ -174,7 +174,7 @@ function attendance(courseName, courseFolderId = null){
 
     //the panel is scrolleable
     if (element.scrollTop != 0) {
-        var participantNames = scrollList(element, participantIds, participantNames, courseName);
+        var participantNames = scrollList(element, participantIds, participantNames, courseName, courseFolderId);
     }
     //the panel is not scrolleable
     else {
@@ -210,7 +210,7 @@ function attendance(courseName, courseFolderId = null){
     }
 }
 
-function scrollList(element, participantIds, participantNames, courseName) {
+function scrollList(element, participantIds, participantNames, courseName, courseFolderId) {
     var num = element.scrollTop
     function scroll(n) {
         element.scrollTop = n
@@ -231,6 +231,7 @@ function scrollList(element, participantIds, participantNames, courseName) {
                     names: participantNames,
                     ids: participantIds,
                     courseName: courseName,
+                    courseFolderId: courseFolderId,
                     meet_id: window.location.href.split('/').pop()
                 }
                 chrome.runtime.sendMessage(data);
