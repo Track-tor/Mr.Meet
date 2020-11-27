@@ -509,3 +509,19 @@ async function randomSelect() {
     document.querySelector('[jsname=SoqoBf]').removeAttribute("aria-disabled")
     document.querySelector('[jsname=SoqoBf]').click()
   }
+
+function processMessageToStudent(message) {
+    if (message.includes("selectStudent/")){
+
+    }
+
+    else if (message.includes("question/")) {
+
+    }
+}
+
+function processMessageToAdmin(message) {
+    if (message.includes("answer/")) {
+
+    }
+}
