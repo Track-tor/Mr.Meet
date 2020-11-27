@@ -131,7 +131,7 @@ function addLayout(){
                         <div class="is878e">
                             <img src="${chrome.runtime.getURL('res/question.svg')}" width="20">
                         </div>
-                        <div class="GdrRqd">Attendance</div>
+                        <div class="GdrRqd">Questions</div>
                     </span>
                 </span>
             </div>`;//le asignamos un formato en HTML
