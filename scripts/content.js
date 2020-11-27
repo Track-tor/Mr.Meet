@@ -1,3 +1,32 @@
+  // Select the node that will be observed for mutations
+  
+  const config = { childList: true, subtree: true };
+  var flag = true
+  
+  // Callback function to execute when mutations are observed
+  const callback = function(mutationsList, observer) {
+      if (flag) {
+          flag = false
+        // Use traditional 'for loops' for IE 11
+        for(const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                //console.log(mutation.addedNodes)
+                if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
+                    var message = mutation.addedNodes[0].innerText
+                    
+                    break
+                }
+            }
+        }
+    }
+    else {
+        flag = true
+    }
+  };
+  
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(callback);
+
 //listeners for communication
  var interval;
 
@@ -53,9 +82,13 @@ chrome.extension.onMessage.addListener(
 function addLayout(){
     let sidePanel = document.querySelector('div[jsname="Kzha2e"]');// obtener el tablero con botones del panel derecho
     
-    if(sidePanel){
+    if(sidePanel){  
+        // Start observing the target node for configured mutations
+        const targetNode = document.querySelector('[jsname=xySENc]');
+        observer.observe(targetNode, config);
 
-        if (!document.querySelector('#extraBoard')) {
+        if (isAdmin()) {
+            if (!document.querySelector('#extraBoard')) {
             //Creamos un tablero de botones extra, para las funcionalidades no locales
             let extraBoard = document.createElement("div");
             extraBoard.setAttribute("id","extraBoard");
@@ -116,8 +149,8 @@ function addLayout(){
             extraBoard.insertBefore(randomSelectButton,null);//insertar el boton en el tablero extra
 
             sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
+            }
         }
-
     }
 }
 
@@ -275,7 +308,7 @@ function scrollList(element, participantIds, participantNames, courseName = null
         }, 200);
         }
         else {
-            //if the scroll come from the random select we dont need to send message to background
+            //if the scroll come from the random select
             if (courseName == null && courseFolderId == null) {
                 setTimeout(function () {
                     var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
@@ -340,11 +373,25 @@ async function randomSelect() {
     }
     else {
       let values = collectParticipants(participantIds, participantNames);
-      participantIds = values[0]
-      participantNames = values[1]
-      var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
+      //check if there are participants
+      if (values != undefined) {
+        participantIds = values[0]
+        participantNames = values[1]
+        var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
 
-      sendChatMessage(selectedParticipant)
+        sendChatMessage(selectedParticipant)
+      }
+      else {
+        Swal.fire({
+            icon: 'info',
+            title: 'Something went wrong',
+            text: "There are not participants in the meet",
+            showConfirmButton: true,
+            onOpen: () => {
+                Swal.hideLoading();
+            }
+        })
+    }
     }
   }
 
@@ -357,4 +404,12 @@ async function randomSelect() {
     document.querySelectorAll('[jsname=YPqjbf]')[1].value = message
     document.querySelector('[jsname=SoqoBf]').removeAttribute("aria-disabled")
     document.querySelector('[jsname=SoqoBf]').click()
+  }
+
+  function isAdmin() {
+      //if have two input elements is admin (allow chat switch and textinput for message)
+      if (document.querySelectorAll('[jsname=YPqjbf]').length == 2) {
+          return true
+      }
+      return false
   }
