@@ -362,8 +362,6 @@ chrome.extension.onMessage.addListener(
               });
               break;
           }
-
-
         });
       })
     }

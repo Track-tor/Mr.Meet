@@ -1,3 +1,38 @@
+  // Select the node that will be observed for mutations
+  
+  const config = { childList: true, subtree: true };
+  var flag = true
+  var isStudent = true;
+  
+  // Callback function to execute when mutations are observed
+  const callback = function(mutationsList, observer) {
+      if (flag) {
+          flag = false
+        // Use traditional 'for loops' for IE 11
+        for(const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                //console.log(mutation.addedNodes)
+                if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
+                    var message = mutation.addedNodes[0].innerText
+                    if (isStudent) {
+                        console.log("soy estudiante! "+ message)
+                    }
+                    else {
+                        console.log("soy admin! "+ message)
+                    }
+                    break
+                }
+            }
+        }
+    }
+    else {
+        flag = true
+    }
+  };
+  
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(callback);
+
 //listeners for communication
  var interval;
 
@@ -94,10 +129,18 @@ chrome.extension.onMessage.addListener(
 
 //renders the layout of the extension
 function addLayout(){
-    let sidePanel = document.querySelector('div[jsname="Kzha2e"]');// obtener el tablero con botones del panel derecho
+    let sidePanel = document.querySelector('div[jsname="Kzha2e"]') //tablero de botones
+    let panel = document.querySelector('[class=pw1uU]');// obtener el panel
     
-    if(sidePanel){
-        if (!document.querySelector('#extraBoard')) {
+    if(panel){ // si el panel esta abierto
+        // Start observing the target node for configured mutations
+        const targetNode = document.querySelector('[jsname=xySENc]');
+        observer.observe(targetNode, config);
+        
+        isAdmin()
+
+        if (!isStudent) {
+            if (!document.querySelector('#extraBoard')) {
             //Creamos un tablero de botones extra, para las funcionalidades no locales
             let extraBoard = document.createElement("div");
             extraBoard.setAttribute("id","extraBoard");
@@ -139,9 +182,27 @@ function addLayout(){
             questionButton.addEventListener("click",() => {getCourses('questions');});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(questionButton,null);//insertar el boton en el tablero extra
 
-            sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
-        }
+            //RANDOM SELECT BUTTON
+            let randomSelectButton = document.createElement("div");//creamos una division dentro del tablero
 
+            randomSelectButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
+                <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
+                <span jsslot="" class="l4V7wb Fxmcue">
+                    <span class="NPEfkd RveJvd snByac">
+                        <div class="is878e">
+                        <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="Hdh4hc cIGbvc NMm5M"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17l-.59.59-.58.58V4h16v12z"></path><path d="M11 12h2v2h-2zm0-6h2v4h-2z"></path></svg>
+                        </div>
+                        <div class="GdrRqd">Random Select</div>
+                    </span>
+                </span>
+            </div>`;//le asignamos un formato en HTML
+
+            randomSelectButton.addEventListener("click",() => {showRandomSelectModal();});//le agregamos la funcion de tomar asistencia
+            extraBoard.insertBefore(randomSelectButton,null);//insertar el boton en el tablero extra
+
+            sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
+            }
+        }
     }
 }
 
@@ -152,6 +213,26 @@ function getCourses(type){
         type: type
     });
 }
+
+
+function getQuestions(){
+    chrome.runtime.sendMessage({msg: 'getCourses'});
+}
+
+function showRandomSelectModal() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "A student will be selected at random and their microphone will be activated",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Select random'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          randomSelect()
+        }
+      })
+}
+
 
 function showAttendanceModal(courses){
     Swal.fire({
@@ -269,7 +350,7 @@ function attendance(courseName, courseFolderId = null){
     }
 }
 
-function scrollList(element, participantIds, participantNames, courseName, courseFolderId) {
+function scrollList(element, participantIds, participantNames, courseName = null, courseFolderId = null) {
     var num = element.scrollTop
     function scroll(n) {
         element.scrollTop = n
@@ -283,18 +364,28 @@ function scrollList(element, participantIds, participantNames, courseName, cours
         }, 200);
         }
         else {
-            setTimeout(function () {
-                console.log("Value is set to " + participantNames);
-                var data = {
-                    msg: "attendance",
-                    names: participantNames,
-                    ids: participantIds,
-                    courseName: courseName,
-                    courseFolderId: courseFolderId,
-                    meet_id: window.location.href.split('/').pop()
-                }
-                chrome.runtime.sendMessage(data);
-            }, 300);
+            //if the scroll come from the random select
+            if (courseName == null && courseFolderId == null) {
+                setTimeout(function () {
+                    var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
+                    sendChatMessage(selectedParticipant)
+                }, 300);
+            }
+            //if the scroll come from the attendance
+            else {
+                setTimeout(function () {
+                    console.log("Value is set to " + participantNames);
+                    var data = {
+                        msg: "attendance",
+                        names: participantNames,
+                        ids: participantIds,
+                        courseName: courseName,
+                        courseFolderId: courseFolderId,
+                        meet_id: window.location.href.split('/').pop()
+                    }
+                    chrome.runtime.sendMessage(data);
+                }, 300);
+            }
         }
     }
     if (element.scrollTop > 0) {
@@ -315,7 +406,6 @@ function collectParticipants(participantIds, participantNames) {
             var name = div.querySelector('[class=ZjFb7c]')
             if (name) {
                 if (!(div.querySelector('[class=QMC9Zd]') || (div.querySelector('[class=jcGw9c]')))) {
-                    console.log(name.innerHTML);
                     participantNames.push(name.innerHTML);
                     participantIds.push(pid);
                 }
@@ -369,4 +459,55 @@ function getQuestions(courseName, courseFolderId){
         courseName: courseName,
         courseFolderId: courseFolderId
     });
+}
+
+async function randomSelect() {
+    var participantIds = [];
+    var participantNames = [];
+    var element = document.querySelector('[role="tabpanel"]')
+    element.scrollTop = element.scrollHeight;
+  
+    if (element.scrollTop != 0) {
+      var participantNames = scrollList(element, participantIds, participantNames);
+    }
+    else {
+      let values = collectParticipants(participantIds, participantNames);
+      //check if there are participants
+      if (values != undefined) {
+        participantIds = values[0]
+        participantNames = values[1]
+        var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
+
+        sendChatMessage(selectedParticipant)
+      }
+      else {
+        Swal.fire({
+            icon: 'info',
+            title: 'Something went wrong',
+            text: "There are not participants in the meet",
+            showConfirmButton: true,
+            onOpen: () => {
+                Swal.hideLoading();
+            }
+        })
+    }
+    }
+  }
+
+  function sendChatMessage(message) {
+    //Allow chat messages to true
+    if (!document.querySelectorAll('[jsname=YPqjbf]')[0].checked) {
+        document.querySelectorAll('[jsname=YPqjbf]')[0].click()
+    }
+    //Send message
+    document.querySelectorAll('[jsname=YPqjbf]')[1].value = message
+    document.querySelector('[jsname=SoqoBf]').removeAttribute("aria-disabled")
+    document.querySelector('[jsname=SoqoBf]').click()
+  }
+
+function isAdmin() {
+    //if have two input elements is admin (allow chat switch and textinput for message)
+    if (document.querySelectorAll('[jsname=YPqjbf]').length == 2) {
+        isStudent = false
+    }
 }
