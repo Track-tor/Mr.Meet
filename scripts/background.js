@@ -1,7 +1,6 @@
 const API_KEY = 'AIzaSyCqS8Ur850llY5mXGy9QA7OsCwpx0wweBw';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://sheets.googleapis.com/$discovery/rest?version=v4"];
 
-
 function onGAPILoad() {
   gapi.client.init({
     apiKey: API_KEY,
@@ -261,12 +260,15 @@ async function addAttendanceSummaryToSheet(spreadSheetId){
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.msg == "initializeApi"){
-      chrome.storage.sync.get(['token'], function (token) {
+	chrome.identity.getAuthToken({interactive: true}, function(token) {
         //set token in api
+        console.log('Accediendo a Token...');
         gapi.auth.setToken({
-          'access_token': token.token
+          'access_token': token
         })
+        console.log('Token obtenido!');
         //create Mr Meet root folder
+        console.log('Buscando carpeta Mr Meet...');
         gapi.client.drive.files.list({
           q: "name='Mr Meet'"
         }).then( function(response) {
