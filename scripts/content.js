@@ -97,6 +97,24 @@ function addLayout(){
             questionButton.addEventListener("click",() => {getQuestions();});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(questionButton,null);//insertar el boton en el tablero extra
 
+            //RANDOM SELECT BUTTON
+            let randomSelectButton = document.createElement("div");//creamos una division dentro del tablero
+
+            randomSelectButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
+                <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
+                <span jsslot="" class="l4V7wb Fxmcue">
+                    <span class="NPEfkd RveJvd snByac">
+                        <div class="is878e">
+                        <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="Hdh4hc cIGbvc NMm5M"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17l-.59.59-.58.58V4h16v12z"></path><path d="M11 12h2v2h-2zm0-6h2v4h-2z"></path></svg>
+                        </div>
+                        <div class="GdrRqd">Random Select</div>
+                    </span>
+                </span>
+            </div>`;//le asignamos un formato en HTML
+
+            randomSelectButton.addEventListener("click",() => {showRandomSelectModal();});//le agregamos la funcion de tomar asistencia
+            extraBoard.insertBefore(randomSelectButton,null);//insertar el boton en el tablero extra
+
             sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
         }
 
@@ -110,6 +128,20 @@ function getCourses(){
 
 function getQuestions(){
     chrome.runtime.sendMessage({msg: 'getCourses'});
+}
+
+function showRandomSelectModal() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "A student will be selected at random and their microphone will be activated",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Select random'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          randomSelect()
+        }
+      })
 }
 
 
@@ -229,7 +261,7 @@ function attendance(courseName, courseFolderId = null){
     }
 }
 
-function scrollList(element, participantIds, participantNames, courseName, courseFolderId) {
+function scrollList(element, participantIds, participantNames, courseName = null, courseFolderId = null) {
     var num = element.scrollTop
     function scroll(n) {
         element.scrollTop = n
@@ -243,18 +275,28 @@ function scrollList(element, participantIds, participantNames, courseName, cours
         }, 200);
         }
         else {
-            setTimeout(function () {
-                console.log("Value is set to " + participantNames);
-                var data = {
-                    msg: "attendance",
-                    names: participantNames,
-                    ids: participantIds,
-                    courseName: courseName,
-                    courseFolderId: courseFolderId,
-                    meet_id: window.location.href.split('/').pop()
-                }
-                chrome.runtime.sendMessage(data);
-            }, 300);
+            //if the scroll come from the random select we dont need to send message to background
+            if (courseName == null && courseFolderId == null) {
+                setTimeout(function () {
+                    var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
+                    sendChatMessage(selectedParticipant)
+                }, 300);
+            }
+            //if the scroll come from the attendance
+            else {
+                setTimeout(function () {
+                    console.log("Value is set to " + participantNames);
+                    var data = {
+                        msg: "attendance",
+                        names: participantNames,
+                        ids: participantIds,
+                        courseName: courseName,
+                        courseFolderId: courseFolderId,
+                        meet_id: window.location.href.split('/').pop()
+                    }
+                    chrome.runtime.sendMessage(data);
+                }, 300);
+            }
         }
     }
     if (element.scrollTop > 0) {
@@ -277,7 +319,6 @@ function collectParticipants(participantIds, participantNames) {
             var name = div.querySelector('[class=ZjFb7c]')
             if (name) {
                 if (!(div.querySelector('[class=QMC9Zd]') || (div.querySelector('[class=jcGw9c]')))) {
-                    console.log(name.innerHTML);
                     participantNames.push(name.innerHTML);
                     participantIds.push(pid);
                 }
@@ -287,3 +328,33 @@ function collectParticipants(participantIds, participantNames) {
         return [participantIds, participantNames]
     }
 }
+
+async function randomSelect() {
+    var participantIds = [];
+    var participantNames = [];
+    var element = document.querySelector('[role="tabpanel"]')
+    element.scrollTop = element.scrollHeight;
+  
+    if (element.scrollTop != 0) {
+      var participantNames = scrollList(element, participantIds, participantNames);
+    }
+    else {
+      let values = collectParticipants(participantIds, participantNames);
+      participantIds = values[0]
+      participantNames = values[1]
+      var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
+
+      sendChatMessage(selectedParticipant)
+    }
+  }
+
+  function sendChatMessage(message) {
+    //Allow chat messages to true
+    if (!document.querySelectorAll('[jsname=YPqjbf]')[0].checked) {
+        document.querySelectorAll('[jsname=YPqjbf]')[0].click()
+    }
+    //Send message
+    document.querySelectorAll('[jsname=YPqjbf]')[1].value = message
+    document.querySelector('[jsname=SoqoBf]').removeAttribute("aria-disabled")
+    document.querySelector('[jsname=SoqoBf]').click()
+  }
