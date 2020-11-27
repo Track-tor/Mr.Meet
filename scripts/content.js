@@ -421,3 +421,21 @@ function isAdmin() {
         isStudent = false
     }
 }
+
+function processMessageToStudent(message) {
+    if (message.includes("selectStudent/")){
+
+    }
+
+    else if (message.includes("question/")) {
+
+    }
+}
+
+function processMessageToAdmin(message) {
+    if (message.includes("answer/")) {
+
+    }
+}
+
+"answer/respuesta,nombre"
