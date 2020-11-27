@@ -509,10 +509,3 @@ async function randomSelect() {
     document.querySelector('[jsname=SoqoBf]').removeAttribute("aria-disabled")
     document.querySelector('[jsname=SoqoBf]').click()
   }
-
-function isAdmin() {
-    //if have two input elements is admin (allow chat switch and textinput for message)
-    if (document.querySelectorAll('[jsname=YPqjbf]').length == 2) {
-        isStudent = false
-    }
-}
