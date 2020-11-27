@@ -51,6 +51,43 @@ chrome.extension.onMessage.addListener(
                 }
             })
         }
+        else if (request.msg == "questionSheetCreationSuccesful"){
+            Swal.fire({
+                title: 'Your Question Sheet has been Created Successfully',
+                text: "Do you want to open it?",
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: 'Open'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdQuestions, "_blank",);
+                    }
+                })
+        }
+        else if (request.msg == "questionObtained"){
+            console.log(request.content);
+            Swal.fire({
+                title: 'Select a Question',
+                input: 'select',
+                inputOptions: request.content,
+                inputPlaceholder: 'Select a course',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: 'Take Attendance',
+                cancelButtonText: 'Cancel',
+                denyButtonText: 'New Course',
+                denyButtonColor: 'LightSeaGreen',
+                inputValidator: (value) => {
+                    return new Promise((resolve) => {
+                      if (value) {
+                        resolve()
+                      } else {
+                        resolve('You need to select a course')
+                      }
+                    })
+                }
+            })
+        }
     }
 );
 
@@ -313,7 +350,7 @@ function selectCourseQuestionsModal(courses){
     }).then((result) => {
         if (result.isConfirmed && result.value) {
             Swal.fire({
-                title: 'GettingQuestions',
+                title: 'Preparing Questions',
                 allowEscapeKey: false,
                 allowOutsideClick: false,
                 onOpen: () => {

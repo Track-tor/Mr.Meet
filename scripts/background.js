@@ -41,8 +41,6 @@ function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names
   });
 }
 
-
-
 function passAttendance(courseName, names, courseFolderId){
   gapi.client.drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
@@ -64,7 +62,7 @@ function passAttendance(courseName, names, courseFolderId){
         }
         else{
           console.log("creating attendance sheet...");
-          var spreadSheetId = await createSpreadSheet(courseName, courseFolderId);
+          var spreadSheetId = await createSpreadSheet(courseName+" Attendance", courseFolderId);
           var sheetDetails = await addSheet(spreadSheetId, "Details");
           var sheetSummary = await addSheet(spreadSheetId, "Summary");
           await addAttendanceSummaryToSheet(spreadSheetId)
@@ -83,10 +81,10 @@ function passAttendance(courseName, names, courseFolderId){
   });
 }
 
-async function createSpreadSheet(courseName, courseFolderId){
+async function createSpreadSheet(sheetName, courseFolderId){
   var body = {
     'parents': [courseFolderId], 
-    'name': courseName+" Attendance",
+    'name': sheetName,
     'mimeType': "application/vnd.google-apps.spreadsheet"
   };
   var spreadSheetId = await gapi.client.drive.files.create({
@@ -158,6 +156,8 @@ function readSheet(spreadSheetId, sheetName){
   });
   return content
 }
+
+
 
 function manageAttendanceSheetContent(content, names) {
   //if doesnt have content add first column
@@ -257,6 +257,74 @@ async function addAttendanceSummaryToSheet(spreadSheetId){
     });
 }
 
+// QUESTION FUNCTIONS
+function checkQuestionSheet(courseName, courseFolderId){
+  gapi.client.drive.files.list({
+    q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
+  }).then(async function(response) {
+    switch(response.status){
+      case 200:
+        var exists = false;
+        var sheet;
+        for (let element of response.result.files){
+          if(element.name == courseName+" Questions"){
+            exists = true;
+            sheet = element
+            break;
+          }
+        }
+        if(exists){
+          console.log("questions sheet exists...");
+          let content = await readSheet(sheet.id, "Questions");
+          console.log(content);
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "questionObtained",content: content});
+          });
+        }
+        else{
+          console.log("creating questions sheet...");
+          let spreadSheetId = await createSpreadSheet(courseName+" Questions", courseFolderId);
+          var sheetQuestions = await addSheet(spreadSheetId, "Questions");
+          await addQuestionFormatToSheet(spreadSheetId);
+        }
+        break;
+      default:
+        console.log('Error getting Questions, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error getting course questions spreadsheet"});
+        });
+        break;
+    }
+  });
+}
+
+function addQuestionFormatToSheet(spreadSheetId){
+  let exampleQuestion = [["Pregunta de ejemplo","respuesta 1","respuesta 2","respuesta 3","respuesta 4"]]
+  gapi.client.sheets.spreadsheets.values.update({
+    spreadsheetId: spreadSheetId,
+    valueInputOption: 'USER_ENTERED',
+    values: exampleQuestion,
+    range: 'Questions!A1',
+    }).then(function(response) {
+      switch(response.status){
+        case 200:
+          console.log("example question added to sheet successfully")
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "questionSheetCreationSuccesful", spreadSheetIdQuestions: spreadSheetId});
+          });
+          break;
+        default:
+          console.log('Error adding example question to sheet, '+response);
+          //send error to content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: 'Error adding example question to sheet'});
+          });
+          break;
+      }
+    });
+}
+
 //listeners for communication
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -349,7 +417,7 @@ chrome.extension.onMessage.addListener(
       });
     }
     else if (request.msg == "getQuestions"){
-      checkSheet(request.courseName ,request.courseFolderId);
+      checkQuestionSheet(request.courseName ,request.courseFolderId);
     }
   }
 );
