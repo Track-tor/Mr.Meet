@@ -2,6 +2,7 @@
   
   const config = { childList: true, subtree: true };
   var flag = true
+  var isStudent = true;
   
   // Callback function to execute when mutations are observed
   const callback = function(mutationsList, observer) {
@@ -13,7 +14,12 @@
                 //console.log(mutation.addedNodes)
                 if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
                     var message = mutation.addedNodes[0].innerText
-                    
+                    if (isStudent) {
+                        console.log("soy estudiante! "+ message)
+                    }
+                    else {
+                        console.log("soy admin! "+ message)
+                    }
                     break
                 }
             }
@@ -80,14 +86,17 @@ chrome.extension.onMessage.addListener(
 
 //renders the layout of the extension
 function addLayout(){
-    let sidePanel = document.querySelector('div[jsname="Kzha2e"]');// obtener el tablero con botones del panel derecho
+    let sidePanel = document.querySelector('div[jsname="Kzha2e"]') //tablero de botones
+    let panel = document.querySelector('[class=pw1uU]');// obtener el panel
     
-    if(sidePanel){  
+    if(panel){ // si el panel esta abierto
         // Start observing the target node for configured mutations
         const targetNode = document.querySelector('[jsname=xySENc]');
         observer.observe(targetNode, config);
+        
+        isAdmin()
 
-        if (isAdmin()) {
+        if (!isStudent) {
             if (!document.querySelector('#extraBoard')) {
             //Creamos un tablero de botones extra, para las funcionalidades no locales
             let extraBoard = document.createElement("div");
@@ -406,10 +415,9 @@ async function randomSelect() {
     document.querySelector('[jsname=SoqoBf]').click()
   }
 
-  function isAdmin() {
-      //if have two input elements is admin (allow chat switch and textinput for message)
-      if (document.querySelectorAll('[jsname=YPqjbf]').length == 2) {
-          return true
-      }
-      return false
-  }
+function isAdmin() {
+    //if have two input elements is admin (allow chat switch and textinput for message)
+    if (document.querySelectorAll('[jsname=YPqjbf]').length == 2) {
+        isStudent = false
+    }
+}
