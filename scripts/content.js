@@ -65,28 +65,29 @@ chrome.extension.onMessage.addListener(
                 })
         }
         else if (request.msg == "questionObtained"){
-            console.log(request.content);
+            let questions = request.content.map(function(x){
+                return x[0];
+            })
+            console.log(questions);
             Swal.fire({
-                title: 'Select a Question',
+                title: 'Select a Question from your sheet',
                 input: 'select',
-                inputOptions: request.content,
-                inputPlaceholder: 'Select a course',
+                inputOptions: questions,
+                inputPlaceholder: 'Select a question',
                 showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: 'Take Attendance',
+                confirmButtonText: 'Send',
                 cancelButtonText: 'Cancel',
-                denyButtonText: 'New Course',
-                denyButtonColor: 'LightSeaGreen',
                 inputValidator: (value) => {
                     return new Promise((resolve) => {
                       if (value) {
                         resolve()
                       } else {
-                        resolve('You need to select a course')
+                        resolve('You need to select a question')
                       }
                     })
                 }
             })
+            //TODO: send quesiton through chat
         }
     }
 );
