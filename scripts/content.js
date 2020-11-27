@@ -107,6 +107,7 @@ chrome.extension.onMessage.addListener(
             Swal.fire({
                 title: 'Select a Question from your sheet',
                 input: 'select',
+                html:'<input type="time" id="timepicker" class="form-control" autofocus>',
                 inputOptions: questions,
                 inputPlaceholder: 'Select a question',
                 showCancelButton: true,
@@ -120,6 +121,11 @@ chrome.extension.onMessage.addListener(
                         resolve('You need to select a question')
                       }
                     })
+                },
+                onOpen: function() {
+                    $('#timepicker').timepicker({
+                        format: 'hh:mm'
+                    });
                 }
             })
             //TODO: send quesiton through chat
@@ -136,10 +142,9 @@ function addLayout(){
         // Start observing the target node for configured mutations
         const targetNode = document.querySelector('[jsname=xySENc]');
         observer.observe(targetNode, config);
-        
-        isAdmin()
 
-        if (!isStudent) {
+        if (sidePanel) {
+            isStudent = false
             if (!document.querySelector('#extraBoard')) {
             //Creamos un tablero de botones extra, para las funcionalidades no locales
             let extraBoard = document.createElement("div");
