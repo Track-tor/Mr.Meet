@@ -152,47 +152,52 @@ chrome.extension.onMessage.addListener(
                 }
             }).then((result) => {
                 console.log(result.dismiss)
-                let timeAsNumber = document.querySelector("#timepicker").valueAsNumber%3600000;
-                checkingForAnswers = true;
+                if(result.dismiss == Swal.DismissReason.backdrop || result.dismiss == Swal.DismissReason.cancel){
+                    console.log("Modal has been forcefully closed!")
+                }
+                else{
+                    let timeAsNumber = document.querySelector("#timepicker").valueAsNumber%3600000;
+                    checkingForAnswers = true;
 
-                question = request.content[(result.value)][0] //set the current question to the selected one
-                answers = request.content[(result.value)].slice(1).map(function(x){
-                    return [x];
-                }) //map the current question to an array of arrays, with each array having the alternative in the corresponding index
+                    question = request.content[(result.value)][0] //set the current question to the selected one
+                    answers = request.content[(result.value)].slice(1).map(function(x){
+                        return [x];
+                    }) //map the current question to an array of arrays, with each array having the alternative in the corresponding index
+                    answers.push(["Not answered"]); //add a last option for unanswered question
 
-                sendChatMessage("question/"+request.content[(result.value)].join(",")+"/"+timeAsNumber.toString());
+                    sendChatMessage("question/"+request.content[(result.value)].join(",")+"/"+timeAsNumber.toString());
 
-                let timerInterval
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-start',
-                    showConfirmButton: false,
-                    timer: timeAsNumber,
-                    timerProgressBar: true
-                })
-                  
-                Toast.fire({
-                    icon: 'info',
-                    html: 'Time left for students to answer: <b></b> seconds.',
-                    onOpen: () => {
-                        timerInterval = setInterval(() => {
-                            const content = Swal.getContent()
-                            if (content) {
-                                const b = content.querySelector('b')
-                                if (b) {
-                                    b.textContent = Math.ceil(Swal.getTimerLeft()/1000)
+                    let timerInterval
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-start',
+                        showConfirmButton: false,
+                        timer: timeAsNumber+2000,
+                        timerProgressBar: true
+                    })
+
+                    Toast.fire({
+                        icon: 'info',
+                        html: 'Time left for students to answer: <b></b> seconds.',
+                        onOpen: () => {
+                            timerInterval = setInterval(() => {
+                                const content = Swal.getContent()
+                                if (content) {
+                                    const b = content.querySelector('b')
+                                    if (b) {
+                                        b.textContent = Math.ceil(Swal.getTimerLeft()/1000)
+                                    }
                                 }
-                            }
-                        }, 100)
-                    },
-                    onClose: () => {
-                        clearInterval(timerInterval)
-                    }
-                }).then(function(){
-                    checkingForAnswers = false;
-                    logAnswers(request.courseFolderId);
-                })
-                  
+                            }, 100)
+                        },
+                        onClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                    }).then(function(){
+                        checkingForAnswers = false;
+                        logAnswers(request.courseFolderId);
+                    })
+                }
             })
         }
         else if(request.msg == "answersLogged"){
@@ -202,10 +207,10 @@ chrome.extension.onMessage.addListener(
                 icon: "success",
                 showCancelButton: true,
                 confirmButtonText: 'Open'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAnswers, "_blank",);
-                    }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAnswers, "_blank",);
+                }
             })
         }
     }
@@ -683,6 +688,7 @@ function processMessageToStudent(message) {
             html:"Time left to answer: <b></b> seconds.",
             input: 'radio',
             allowOutsideClick: false,
+            allowEscapeKey: false,
             inputOptions: inputOptions,
             timer: time,
             timerProgressBar: true,
@@ -706,8 +712,10 @@ function processMessageToStudent(message) {
                 clearInterval(timerInterval)
             }
         }).then(function(result){
+            //if the modal closed because of the timer 
             if (result.dismiss === Swal.DismissReason.timer) {
                 console.log('I was closed by the timer')
+                sendChatMessage("answer/"+alternatives.length+","+getMyName())
             }
             else{
                 console.log(result.value);
@@ -740,10 +748,12 @@ function replaceChatMessages() {
         if (message.innerText.includes("selectStudent/"))
           message.innerText = "A random student has been unmuted";
         else if (message.innerText.includes("question/"))
-          message.innerText = "You have been sent the question: " + message.innerText.split("/")[1].split(',')[0];
-        else if (message.innerText.includes("answer/"))
+          message.innerText = "You have sent the question: " + message.innerText.split("/")[1].split(',')[0];
+        else if (message.innerText.includes("answer/")){
+            console.log(answers)
+            console.log(message.innerText.split("/")[1].split(','));
             message.innerText = message.innerText.split(',').pop() + " has answered: " + answers[parseInt(message.innerText.split("/")[1].split(',')[0])][0];
-        
+        }
       }
     }
   }
@@ -764,7 +774,7 @@ function replacePopupChatMessages() {
             if (message.innerText.includes("selectStudent/")) 
                 message.innerText = "A random student has been unmuted";
             else if (message.innerText.includes("question/"))
-                message.innerText = "You have been sent a question";
+                message.innerText = "You have sent a question";
             else if (message.innerText.includes("answer/"))
                 message.innerText = message.innerText.split(',').pop() + " has answered: " + answers[parseInt(message.innerText.split("/")[1].split(',')[0])][0];
         }
