@@ -143,6 +143,36 @@ chrome.extension.onMessage.addListener(
                 let timeAsNumber = document.querySelector("#timepicker").valueAsNumber%3600000;
                 checkingForAnswers = true;
 
+                sendChatMessage("question/"+request.content[(result.value)].join(",")+","+timeAsNumber.toString());
+
+                let timerInterval
+                Swal.fire({
+                    title: 'Auto close alert!',
+                    html: 'Time left for students to answer: <b></b> seconds.',
+                    timer: timeAsNumber,
+                    timerProgressBar: true,
+                    onOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => {
+                            console.log("hola");
+                            const content = Swal.getContent()
+                            if (content) {
+                                console.log("content");
+                                const b = content.querySelector('b')
+                                if (b) {
+                                    b.textContent = Math.ceil(Swal.getTimerLeft()/1000)
+                                }
+                            }
+                        }, 100)
+                    },
+                    onClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                        console.log('I was closed by the timer')
+                    }
+                })
             })
         }
     }
@@ -544,7 +574,12 @@ async function randomSelect() {
         document.querySelectorAll('[jsname=YPqjbf]')[0].click()
     }
     //Send message
-    document.querySelectorAll('[jsname=YPqjbf]')[1].value = message
+    if(document.querySelectorAll('[jsname=YPqjbf]').length == 1){
+        document.querySelectorAll('[jsname=YPqjbf]')[0].value = message
+    }
+    else{
+        document.querySelectorAll('[jsname=YPqjbf]')[1].value = message
+    }
     document.querySelector('[jsname=SoqoBf]').removeAttribute("aria-disabled")
     document.querySelector('[jsname=SoqoBf]').click()
   }
