@@ -591,12 +591,15 @@ function replaceChatMessages() {
       if (isStudent) {
         if (message.innerText.includes("selectStudent/"))
           message.innerText = "The teacher has selected a random student";
+        else if (message.innerText.includes("question/"))
+          message.innerText = "The teacher has send a question";
       }
   
       else {
-        if (message.innerText.includes("selectStudent/")) {
+        if (message.innerText.includes("selectStudent/"))
           message.innerText = "A random student has been unmuted";
-        }
+        else if (message.innerText.includes("question/"))
+          message.innerText = "You has been send a question";
       }
     }
   }
@@ -607,13 +610,15 @@ function replacePopupChatMessages() {
         if (isStudent) {
             if (message.innerText.includes("selectStudent/"))
                 message.innerText = "The teacher has selected a random student";
+            else if (message.innerText.includes("question/"))
+                message.innerText = "The teacher has send a question";
             }
 
         else {
-            if (message.innerText.includes("selectStudent/")) {
+            if (message.innerText.includes("selectStudent/")) 
                 message.innerText = "A random student has been unmuted";
-            }
-
+            else if (message.innerText.includes("question/"))
+                message.innerText = "You has been send a question";
         }
     }
 }
