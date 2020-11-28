@@ -16,6 +16,7 @@ const callback = function(mutationsList, observer) {
                 else {
                     console.log("soy admin! "+ message)
                 }
+                replaceChatMessages()
                 break
             }
         }
@@ -26,15 +27,18 @@ const callback = function(mutationsList, observer) {
 const callback2 = function(mutationsList, observer) {
     for(const mutation of mutationsList) {
         if (mutation.type === 'childList') {
-            if (mutation.addedNodes[0] && mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
-                var message = mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc').innerText
-                if (isStudent) {
-                    processMessageToStudent(message)
+            if (mutation.addedNodes[0]) {
+                if (mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
+                    var message = mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc').innerText
+                    if (isStudent) {
+                        processMessageToStudent(message)
+                    }
+                    else {
+                        console.log("soy admin! "+ message)
+                    }
+                    replacePopupChatMessages()
+                    break
                 }
-                else {
-                    console.log("soy admin! "+ message)
-                }
-                break
             }
         }
     }
@@ -151,9 +155,14 @@ function addLayout(){
 
     //observe popups
     const chatPopup = document.querySelector('.NSvDmb.cM3h5d')
-    observer2.observe(chatPopup, config);
+    if (chatPopup) {
+        observer2.observe(chatPopup, config);
+    }
     
     if(panel){ // si el panel esta abierto
+        //reemplazamos los mensajes del chat con comandos
+        replaceChatMessages()
+
         // observe chat panel if panel is open
         const chatPanel = document.querySelector('[jsname=xySENc]');
         observer.observe(chatPanel, config);
@@ -161,6 +170,7 @@ function addLayout(){
     
         myId = document.querySelector('[class=GvcuGe]').firstChild.getAttribute('data-participant-id').split('/').pop()
 
+        //si es admin
         if (sidePanel) {
             isStudent = false
             if (!document.querySelector('#extraBoard')) {
@@ -575,3 +585,35 @@ function processMessageToAdmin(message) {
     }
 }
 
+function replaceChatMessages() {
+    var chatMessages = document.querySelectorAll('.oIy2qc');
+    for (let message of chatMessages) {
+      if (isStudent) {
+        if (message.innerText.includes("selectStudent/"))
+          message.innerText = "The teacher has selected a random student";
+      }
+  
+      else {
+        if (message.innerText.includes("selectStudent/")) {
+          message.innerText = "A random student has been unmuted";
+        }
+      }
+    }
+  }
+
+function replacePopupChatMessages() {
+    var chatMessages = document.querySelectorAll('.mVuLZ.xtO4Tc')
+    for (let message of chatMessages) {
+        if (isStudent) {
+            if (message.innerText.includes("selectStudent/"))
+                message.innerText = "The teacher has selected a random student";
+            }
+
+        else {
+            if (message.innerText.includes("selectStudent/")) {
+                message.innerText = "A random student has been unmuted";
+            }
+
+        }
+    }
+}
