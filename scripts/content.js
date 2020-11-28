@@ -146,13 +146,18 @@ chrome.extension.onMessage.addListener(
                 sendChatMessage("question/"+request.content[(result.value)].join(",")+","+timeAsNumber.toString());
 
                 let timerInterval
-                Swal.fire({
-                    title: 'Auto close alert!',
-                    html: 'Time left for students to answer: <b></b> seconds.',
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-start',
+                    showConfirmButton: false,
                     timer: timeAsNumber,
-                    timerProgressBar: true,
+                    timerProgressBar: true
+                  })
+                  
+                  Toast.fire({
+                    icon: 'info',
+                    html: ' Time left for students to answer: <b></b> seconds.',
                     onOpen: () => {
-                        Swal.showLoading()
                         timerInterval = setInterval(() => {
                             console.log("hola");
                             const content = Swal.getContent()
@@ -168,11 +173,10 @@ chrome.extension.onMessage.addListener(
                     onClose: () => {
                         clearInterval(timerInterval)
                     }
-                }).then((result) => {
-                    if (result.dismiss === Swal.DismissReason.timer) {
-                        console.log('I was closed by the timer')
-                    }
-                })
+                  }).then(function(){
+                    checkingForAnswers = false;
+                  })
+                  
             })
         }
     }
@@ -236,7 +240,11 @@ function addLayout(){
                 </span>
             </div>`;//le asignamos un formato en HTML
 
-            questionButton.addEventListener("click",() => {getCourses('questions');});//le agregamos la funcion de tomar asistencia
+            questionButton.addEventListener("click",() => {
+                if(!checkingForAnswers){
+                    getCourses('questions');
+                }
+            });//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(questionButton,null);//insertar el boton en el tablero extra
 
             //RANDOM SELECT BUTTON
@@ -265,10 +273,23 @@ function addLayout(){
 
 // FUNCIONALIDAD DE ASISTENCIA
 function getCourses(type){
-    chrome.runtime.sendMessage({
-        msg: 'getCourses',
-        type: type
-    });
+    if (document.querySelectorAll('[role=listitem]').length > 1) { 
+        chrome.runtime.sendMessage({
+            msg: 'getCourses',
+            type: type
+        });
+    }
+    else{
+        Swal.fire({
+            icon: 'info',
+            title: 'Something went wrong',
+            text: "There are not participants in the meet",
+            showConfirmButton: true,
+            onOpen: () => {
+                Swal.hideLoading();
+            }
+        })
+    }
 }
 
 

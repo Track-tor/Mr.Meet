@@ -168,6 +168,7 @@ function manageAttendanceSheetContent(content, names) {
   }
   //proceed to add attendance row
   //add date to first row
+  //TODO: function for datetime
   var now = new Date()
   var date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
   content[0].push(date)
