@@ -592,14 +592,20 @@ function replaceChatMessages() {
         if (message.innerText.includes("selectStudent/"))
           message.innerText = "The teacher has selected a random student";
         else if (message.innerText.includes("question/"))
-          message.innerText = "The teacher has send a question";
+          message.innerText = "The teacher has send a question: " + message.innerText.split(',')[1];
+        else if (message.innerText.includes("answer/"))
+          message.innerText = message.innerText.split(',').pop() + " has been answer the question";
+    
       }
   
       else {
         if (message.innerText.includes("selectStudent/"))
           message.innerText = "A random student has been unmuted";
         else if (message.innerText.includes("question/"))
-          message.innerText = "You has been send a question";
+          message.innerText = "You has been send the question: " + message.innerText.split(',')[1];
+        else if (message.innerText.includes("answer/"))
+            message.innerText = message.innerText.split(',').pop() + " has been answer: " + message.innerText.split(',')[1];
+        
       }
     }
   }
@@ -612,6 +618,8 @@ function replacePopupChatMessages() {
                 message.innerText = "The teacher has selected a random student";
             else if (message.innerText.includes("question/"))
                 message.innerText = "The teacher has send a question";
+            else if (message.innerText.includes("answer/"))
+                message.innerText = message.innerText.split(',').pop() + " has been answer the question";
             }
 
         else {
@@ -619,6 +627,8 @@ function replacePopupChatMessages() {
                 message.innerText = "A random student has been unmuted";
             else if (message.innerText.includes("question/"))
                 message.innerText = "You has been send a question";
+            else if (message.innerText.includes("answer/"))
+                message.innerText = message.innerText.split(',').pop() + " has been answer: " + message.innerText.split(',')[1];
         }
     }
 }
