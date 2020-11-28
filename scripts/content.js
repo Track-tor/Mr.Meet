@@ -197,17 +197,61 @@ chrome.extension.onMessage.addListener(
                     }).then(function(){
                         checkingForAnswers = false;
                         logAnswers(request.courseFolderId);
+                        Swal.fire({
+                            title: 'Logging answers...',
+                            allowEscapeKey: false,
+                            allowOutsideClick: false,
+                            onOpen: () => {
+                                Swal.showLoading();
+                            }
+                        })
                     })
                 }
             })
         }
         else if(request.msg == "answersLogged"){
+
+            let dataset = answers.map(function(x){
+                return x.length -1
+            })
+
+            let labels = answers.map(function(x){
+                return x[0]
+            })
+
+            let [backgroundColor,borderColor] = [[],[]]
+            for (let i = 0; i < answers.length; i++){
+                let colors = generateColor()
+                backgroundColor.push(colors[0]);
+                borderColor.push(colors[1]);
+            }
+            console.log(backgroundColor);
+            console.log(borderColor);
+
             Swal.fire({
-                title: "Your students' answers have been Logged Successfully",
+                html:`Here's a quick summary:</br><canvas id="myChart" width="400" height="400"></canvas>`,
+                title: "Your students' answers have been Logged Successfully!",
                 text: "Do you want to see them?",
                 icon: "success",
                 showCancelButton: true,
-                confirmButtonText: 'Open'
+                confirmButtonText: 'Open',
+                onOpen: () =>{
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: "Your students' answers",
+                                data: dataset,
+                                backgroundColor: backgroundColor,
+                                borderColor: borderColor,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {}
+                    });
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAnswers, "_blank",);
@@ -816,4 +860,9 @@ function logAnswers(courseFolderId){
         answers: answers,
         courseFolderId: courseFolderId
     });
+}
+
+function generateColor(){
+    const max = 255, o = Math.round, r = Math.random
+    return [`rgba(${o(r()*max)}, ${o(r()*max)}, ${o(r()*max)}, 0.2)`,`rgba(${o(r()*max)}, ${o(r()*max)}, ${o(r()*max)}, 1)`]
 }

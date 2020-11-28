@@ -17,7 +17,11 @@
             "js":[
                 "js/jquery.js",
                 "js/sweet-alert.js",
+                "js/Chart.min.js",
                 "scripts/content.js"
+            ],
+            "css":[
+                "css/Chart.min.css"
             ]
         }
     ],
