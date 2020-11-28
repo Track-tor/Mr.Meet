@@ -3,6 +3,7 @@
 const config = { childList: true, subtree: true };
 var isStudent = true;
 var myId
+var defaultCourse = ""
 
 // Callback function to execute when mutations are observed in chat panel
 const callback = function(mutationsList, observer) {
@@ -273,6 +274,7 @@ function showAttendanceModal(courses){
         input: 'select',
         inputOptions: courses,
         inputPlaceholder: 'Select a course',
+        inputValue: defaultCourse,
         showCancelButton: true,
         showDenyButton: true,
         confirmButtonText: 'Take Attendance',
@@ -299,6 +301,7 @@ function showAttendanceModal(courses){
                     Swal.showLoading();
                 }
             })
+            defaultCourse = result.value
             attendance(courses[result.value], result.value);
         }
         //Modal to create new course
@@ -468,6 +471,7 @@ function selectCourseQuestionsModal(courses){
         input: 'select',
         inputOptions: courses,
         inputPlaceholder: 'Select a course',
+        inputValue: defaultCourse,
         showCancelButton: true,
         confirmButtonText: 'Get Questions',
         cancelButtonText: 'Cancel',
@@ -490,6 +494,7 @@ function selectCourseQuestionsModal(courses){
                     Swal.showLoading();
                 }
             })
+            defaultCourse = result.value
             getQuestions(courses[result.value], result.value);
         }
     })
