@@ -1,37 +1,48 @@
-  // Select the node that will be observed for mutations
-  
-  const config = { childList: true, subtree: true };
-  var flag = true
-  var isStudent = true;
-  
-  // Callback function to execute when mutations are observed
-  const callback = function(mutationsList, observer) {
-      if (flag) {
-          flag = false
-        // Use traditional 'for loops' for IE 11
-        for(const mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                //console.log(mutation.addedNodes)
-                if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
-                    var message = mutation.addedNodes[0].innerText
-                    if (isStudent) {
-                        console.log("soy estudiante! "+ message)
-                    }
-                    else {
-                        console.log("soy admin! "+ message)
-                    }
-                    break
+// Select the node that will be observed for mutations
+
+const config = { childList: true, subtree: true };
+var isStudent = true;
+var myId
+
+// Callback function to execute when mutations are observed in chat panel
+const callback = function(mutationsList, observer) {
+    for(const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
+                var message = mutation.addedNodes[0].innerText
+                if (isStudent) {
+                    processMessageToStudent(message)
                 }
+                else {
+                    console.log("soy admin! "+ message)
+                }
+                break
             }
         }
     }
-    else {
-        flag = true
+};
+
+// Callback function to execute when mutations are observed in popup chat messages
+const callback2 = function(mutationsList, observer) {
+    for(const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            if (mutation.addedNodes[0] && mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
+                var message = mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc').innerText
+                if (isStudent) {
+                    processMessageToStudent(message)
+                }
+                else {
+                    console.log("soy admin! "+ message)
+                }
+                break
+            }
+        }
     }
-  };
+};
   
-// Create an observer instance linked to the callback function
+// Create observer instances linked to the callback functions
 const observer = new MutationObserver(callback);
+const observer2 = new MutationObserver(callback2);
 
 //listeners for communication
  var interval;
@@ -137,11 +148,18 @@ chrome.extension.onMessage.addListener(
 function addLayout(){
     let sidePanel = document.querySelector('div[jsname="Kzha2e"]') //tablero de botones
     let panel = document.querySelector('[class=pw1uU]');// obtener el panel
+
+    //observe popups
+    const chatPopup = document.querySelector('.NSvDmb.cM3h5d')
+    observer2.observe(chatPopup, config);
     
     if(panel){ // si el panel esta abierto
-        // Start observing the target node for configured mutations
-        const targetNode = document.querySelector('[jsname=xySENc]');
-        observer.observe(targetNode, config);
+        // observe chat panel if panel is open
+        const chatPanel = document.querySelector('[jsname=xySENc]');
+        observer.observe(chatPanel, config);
+        
+    
+        myId = document.querySelector('[class=GvcuGe]').firstChild.getAttribute('data-participant-id').split('/').pop()
 
         if (sidePanel) {
             isStudent = false
@@ -372,8 +390,17 @@ function scrollList(element, participantIds, participantNames, courseName = null
             //if the scroll come from the random select
             if (courseName == null && courseFolderId == null) {
                 setTimeout(function () {
-                    var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
-                    sendChatMessage(selectedParticipant)
+                    var randomNumber = Math.floor(Math.random() * participantIds.length)
+                    var selectedParticipant = participantIds[randomNumber];
+
+                    sendChatMessage("selectStudent/" + selectedParticipant)
+
+                    Swal.fire(
+                        participantNames[randomNumber] + ' has been selected',
+                        'His microphone has been activated',
+                        'question'
+                    )
+
                 }, 300);
             }
             //if the scroll come from the attendance
@@ -481,9 +508,17 @@ async function randomSelect() {
       if (values != undefined) {
         participantIds = values[0]
         participantNames = values[1]
-        var selectedParticipant = participantIds[Math.floor(Math.random() * participantIds.length)];
+        var randomNumber = Math.floor(Math.random() * participantIds.length)
+        var selectedParticipant = participantIds[randomNumber];
 
-        sendChatMessage(selectedParticipant)
+        sendChatMessage("selectStudent/" + selectedParticipant)
+
+        Swal.fire(
+            participantNames[randomNumber] + ' has been selected',
+            'His microphone has been activated',
+            'success'
+        )
+
       }
       else {
         Swal.fire({
@@ -512,7 +547,21 @@ async function randomSelect() {
 
 function processMessageToStudent(message) {
     if (message.includes("selectStudent/")){
-
+        selectedId = message.split('/').pop()
+        console.log(selectedId)
+        console.log(myId)
+        
+        if (selectedId == myId) {
+            var isMuted = document.querySelector('[jsname=BOHaEe]').getAttribute('data-is-muted')
+            if (isMuted) {
+                document.querySelector('[jsname=BOHaEe]').click()
+            }
+            Swal.fire(
+                'You have been selected',
+                'Your microphone has been activated',
+                'question'
+            )
+        }
     }
 
     else if (message.includes("question/")) {
@@ -525,3 +574,4 @@ function processMessageToAdmin(message) {
 
     }
 }
+
