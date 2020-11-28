@@ -130,7 +130,8 @@ chrome.extension.onMessage.addListener(
             Swal.fire({
                 title: 'Select a Question from your sheet',
                 input: 'select',
-                html:'<label for="timepicker">Time: </label><input id="timepicker" type="time" max="01:59:59" step="1">',
+                html:   '<label for="timepicker">Time to answer: </label><input id="timepicker" type="time" max="01:59:59" step="1"> <br/>'+
+                        '2 additional seconds will be given to register answers!',
                 inputOptions: questions,
                 inputPlaceholder: 'Select a question',
                 showCancelButton: true,
