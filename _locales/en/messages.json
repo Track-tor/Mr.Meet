@@ -1,0 +1,17 @@
+{
+    "appName": {
+      "message": "My App"
+    },
+    "appDesc": {
+      "message": "This app does something awesome."
+    },
+    "attendance": {
+        "message": "Attendance"
+    },
+    "question": {
+        "message": "Question"
+    },
+    "random_select": {
+        "message": "Random Select"
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "appName": {
+      "message": "Mi App"
+        },
+    "appDesc": {
+      "message": "Esta app hace algo maravilloso."
+    },
+    "attendance": {
+        "message": "Asistencia"
+    }
+  }
