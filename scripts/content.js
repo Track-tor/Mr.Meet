@@ -4,6 +4,7 @@ const config = { childList: true, subtree: true };
 var isStudent = true;
 var myId
 var checkingForAnswers = false
+var defaultCourse = ""
 
 // Callback function to execute when mutations are observed in chat panel
 const callback = function(mutationsList, observer) {
@@ -17,6 +18,7 @@ const callback = function(mutationsList, observer) {
                 else {
                     processMessageToAdmin(message)
                 }
+                replaceChatMessages()
                 break
             }
         }
@@ -27,15 +29,18 @@ const callback = function(mutationsList, observer) {
 const callback2 = function(mutationsList, observer) {
     for(const mutation of mutationsList) {
         if (mutation.type === 'childList') {
-            if (mutation.addedNodes[0] && mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
-                var message = mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc').innerText
-                if (isStudent) {
-                    processMessageToStudent(message)
+            if (mutation.addedNodes[0]) {
+                if (mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
+                    var message = mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc').innerText
+                    if (isStudent) {
+                        processMessageToStudent(message)
+                    }
+                    else {
+                        console.log("soy admin! "+ message)
+                    }
+                    replacePopupChatMessages()
+                    break
                 }
-                else {
-                    processMessageToAdmin(message)
-                }
-                break
             }
         }
     }
@@ -189,9 +194,14 @@ function addLayout(){
 
     //observe popups
     const chatPopup = document.querySelector('.NSvDmb.cM3h5d')
-    observer2.observe(chatPopup, config);
+    if (chatPopup) {
+        observer2.observe(chatPopup, config);
+    }
     
     if(panel){ // si el panel esta abierto
+        //reemplazamos los mensajes del chat con comandos
+        replaceChatMessages()
+
         // observe chat panel if panel is open
         const chatPanel = document.querySelector('[jsname=xySENc]');
         observer.observe(chatPanel, config);
@@ -199,6 +209,7 @@ function addLayout(){
     
         myId = document.querySelector('[class=GvcuGe]').firstChild.getAttribute('data-participant-id').split('/').pop()
 
+        //si es admin
         if (sidePanel) {
             isStudent = false
             if (!document.querySelector('#extraBoard')) {
@@ -318,6 +329,7 @@ function showAttendanceModal(courses){
         input: 'select',
         inputOptions: courses,
         inputPlaceholder: 'Select a course',
+        inputValue: defaultCourse,
         showCancelButton: true,
         showDenyButton: true,
         confirmButtonText: 'Take Attendance',
@@ -344,6 +356,7 @@ function showAttendanceModal(courses){
                     Swal.showLoading();
                 }
             })
+            defaultCourse = result.value
             attendance(courses[result.value], result.value);
         }
         //Modal to create new course
@@ -513,6 +526,7 @@ function selectCourseQuestionsModal(courses){
         input: 'select',
         inputOptions: courses,
         inputPlaceholder: 'Select a course',
+        inputValue: defaultCourse,
         showCancelButton: true,
         confirmButtonText: 'Get Questions',
         cancelButtonText: 'Cancel',
@@ -535,6 +549,7 @@ function selectCourseQuestionsModal(courses){
                     Swal.showLoading();
                 }
             })
+            defaultCourse = result.value
             getQuestions(courses[result.value], result.value);
         }
     })
@@ -635,3 +650,50 @@ function processMessageToAdmin(message) {
     }
 }
 
+function replaceChatMessages() {
+    var chatMessages = document.querySelectorAll('.oIy2qc');
+    for (let message of chatMessages) {
+      if (isStudent) {
+        if (message.innerText.includes("selectStudent/"))
+          message.innerText = "The teacher has selected a random student";
+        else if (message.innerText.includes("question/"))
+          message.innerText = "The teacher has send a question: " + message.innerText.split(',')[1];
+        else if (message.innerText.includes("answer/"))
+          message.innerText = message.innerText.split(',').pop() + " has been answer the question";
+    
+      }
+  
+      else {
+        if (message.innerText.includes("selectStudent/"))
+          message.innerText = "A random student has been unmuted";
+        else if (message.innerText.includes("question/"))
+          message.innerText = "You has been send the question: " + message.innerText.split(',')[1];
+        else if (message.innerText.includes("answer/"))
+            message.innerText = message.innerText.split(',').pop() + " has been answer: " + message.innerText.split(',')[1];
+        
+      }
+    }
+  }
+
+function replacePopupChatMessages() {
+    var chatMessages = document.querySelectorAll('.mVuLZ.xtO4Tc')
+    for (let message of chatMessages) {
+        if (isStudent) {
+            if (message.innerText.includes("selectStudent/"))
+                message.innerText = "The teacher has selected a random student";
+            else if (message.innerText.includes("question/"))
+                message.innerText = "The teacher has send a question";
+            else if (message.innerText.includes("answer/"))
+                message.innerText = message.innerText.split(',').pop() + " has been answer the question";
+            }
+
+        else {
+            if (message.innerText.includes("selectStudent/")) 
+                message.innerText = "A random student has been unmuted";
+            else if (message.innerText.includes("question/"))
+                message.innerText = "You has been send a question";
+            else if (message.innerText.includes("answer/"))
+                message.innerText = message.innerText.split(',').pop() + " has been answer: " + message.innerText.split(',')[1];
+        }
+    }
+}
