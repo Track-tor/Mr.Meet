@@ -234,8 +234,9 @@ function addLayout(){
 
         // observe chat panel if panel is open
         const chatPanel = document.querySelector('[jsname=xySENc]');
-        observer.observe(chatPanel, config);
-        
+        if (chatPanel){
+            observer.observe(chatPanel, config);
+        }
     
         myId = document.querySelector('[class=GvcuGe]').firstChild.getAttribute('data-participant-id').split('/').pop()
 
