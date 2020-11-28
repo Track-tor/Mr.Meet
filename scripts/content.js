@@ -3,6 +3,7 @@
   const config = { childList: true, subtree: true };
   var flag = true
   var isStudent = true;
+  var checkingForAnswers = false
   
   // Callback function to execute when mutations are observed
   const callback = function(mutationsList, observer) {
@@ -15,10 +16,10 @@
                 if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
                     var message = mutation.addedNodes[0].innerText
                     if (isStudent) {
-                        console.log("soy estudiante! "+ message)
+                        processMessageToStudent(message);
                     }
                     else {
-                        console.log("soy admin! "+ message)
+                        processMessageToAdmin(message);
                     }
                     break
                 }
@@ -107,7 +108,7 @@ chrome.extension.onMessage.addListener(
             Swal.fire({
                 title: 'Select a Question from your sheet',
                 input: 'select',
-                html:'<input type="time" id="timepicker" class="form-control" autofocus>',
+                html:'<label for="timepicker">Time: </label><input id="timepicker" type="time" max="01:59:59" step="1">',
                 inputOptions: questions,
                 inputPlaceholder: 'Select a question',
                 showCancelButton: true,
@@ -116,19 +117,22 @@ chrome.extension.onMessage.addListener(
                 inputValidator: (value) => {
                     return new Promise((resolve) => {
                       if (value) {
-                        resolve()
+                          if(document.querySelector("#timepicker").valueAsNumber%3600000){
+                            resolve()
+                          }
+                          else{
+                            resolve('You need to set a valid time')
+                          }
                       } else {
                         resolve('You need to select a question')
                       }
                     })
-                },
-                onOpen: function() {
-                    $('#timepicker').timepicker({
-                        format: 'hh:mm'
-                    });
                 }
+            }).then((result) => {
+                let timeAsNumber = document.querySelector("#timepicker").valueAsNumber%3600000;
+                checkingForAnswers = true;
+
             })
-            //TODO: send quesiton through chat
         }
     }
 );
@@ -521,7 +525,7 @@ function processMessageToStudent(message) {
 }
 
 function processMessageToAdmin(message) {
-    if (message.includes("answer/")) {
+    if (message.includes("answer/") && checkingForAnswers) {
 
     }
 }
