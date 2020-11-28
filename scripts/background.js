@@ -1,11 +1,23 @@
 const API_KEY = 'AIzaSyCqS8Ur850llY5mXGy9QA7OsCwpx0wweBw';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://sheets.googleapis.com/$discovery/rest?version=v4"];
 
+/*
+TODO: Modularize functions for DRY code: turn addAttendanceDetailToSheet(), addAttendanceSummaryToSheet() and addQuestionFormatToSheet() to addContentToSheetInSpreadsheet()
+TODO: Add error handling for certain parts of the code: Use of tabs, ...
+
+*/
+
 function onGAPILoad() {
   gapi.client.init({
     apiKey: API_KEY,
     discoveryDocs: DISCOVERY_DOCS,
   });
+}
+
+function getDateTime(){
+  let now = new Date();
+  let date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+  return date;
 }
 
 function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names = null, courseFolderId = null) {
@@ -168,10 +180,8 @@ function manageAttendanceSheetContent(content, names) {
   }
   //proceed to add attendance row
   //add date to first row
-  //TODO: function for datetime
-  var now = new Date()
-  var date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
-  content[0].push(date)
+  
+  content[0].push(getDateTime());
   for (i = 1; i < content.length; i++) {
     if (names.includes(content[i][0])) {
       //if the name is already in the spreadsheet
@@ -258,7 +268,7 @@ async function addAttendanceSummaryToSheet(spreadSheetId){
 }
 
 // QUESTION FUNCTIONS
-function checkQuestionSheet(courseName, courseFolderId){
+function checkQuestionSpreadsheet(courseName, courseFolderId){
   gapi.client.drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
   }).then(async function(response) {
@@ -278,7 +288,7 @@ function checkQuestionSheet(courseName, courseFolderId){
           let content = await readSheet(sheet.id, "Questions");
           console.log(content);
           chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {msg: "questionObtained",content: content});
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "questionsObtained",content: content, courseFolderId: courseFolderId});
           });
         }
         else{
@@ -316,6 +326,71 @@ function addQuestionFormatToSheet(spreadSheetId){
           break;
         default:
           console.log('Error adding example question to sheet, '+response);
+          //send error to content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: 'Error adding example question to sheet'});
+          });
+          break;
+      }
+    });
+}
+
+//Answers functions
+function checkAnswerSpreadheet(questionName, courseFolderId, answers){
+  gapi.client.drive.files.list({
+    q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
+  }).then(async function(response) {
+    switch(response.status){
+      case 200:
+        let currentDatetime = getDateTime();
+        var exists = false;
+        var sheet;
+        for (let element of response.result.files){
+          if(element.name == questionName+" Answers"){
+            exists = true;
+            sheet = element
+            break;
+          }
+        }
+        if(exists){
+          console.log("answer sheet exists...");
+          var sheetQuestions = await addSheet(sheet.id, currentDatetime);
+          await addContentToSheetInSpreadsheet(sheet.id, answers, currentDatetime);
+        }
+        else{
+          console.log("creating answer sheet...");
+          let spreadSheetId = await createSpreadSheet(questionName+" Answers", courseFolderId);
+          var sheetQuestions = await addSheet(spreadSheetId, currentDatetime);
+          await addContentToSheetInSpreadsheet(spreadSheetId, answers, currentDatetime);
+        }
+        break;
+      default:
+        console.log('Error logging answers, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error logging answers to spreadsheet"});
+        });
+        break;
+    }
+  });
+}
+
+function addContentToSheetInSpreadsheet(spreadSheetId, content, sheetName){
+  gapi.client.sheets.spreadsheets.values.update({
+    spreadsheetId: spreadSheetId,
+    valueInputOption: 'USER_ENTERED',
+    values: content,
+    range: sheetName+'!A1:Z1000',
+    }).then(function(response) {
+      switch(response.status){
+        case 200:
+          console.log("content to sheet successfully")
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "answersLogged", spreadSheetIdAnswers: spreadSheetId});
+          });
+          break;
+        default:
+          console.log('Error adding content to sheet, '+response);
           //send error to content script
           chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: 'Error adding example question to sheet'});
@@ -377,12 +452,6 @@ chrome.extension.onMessage.addListener(
         passAttendance(request.courseName, request.names, request.courseFolderId);
       }
     }
-    else if (request.msg == 'question'){
-      //questions
-    }
-    else if (request.msg == 'answer'){
-      //answer
-    }
     else if (request.msg == 'getCourses'){
       chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
         gapi.client.drive.files.list({
@@ -418,7 +487,10 @@ chrome.extension.onMessage.addListener(
       });
     }
     else if (request.msg == "getQuestions"){
-      checkQuestionSheet(request.courseName ,request.courseFolderId);
+      checkQuestionSpreadsheet(request.courseName ,request.courseFolderId);
+    }
+    else if (request.msg == "logAnswers"){
+      checkAnswerSpreadheet(request.question, request.courseFolderId, request.answers);
     }
   }
 );

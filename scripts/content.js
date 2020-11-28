@@ -5,6 +5,8 @@ var isStudent = true;
 var myId
 var checkingForAnswers = false
 var defaultCourse = ""
+var answers //current answers
+var question  //current question
 
 // Callback function to execute when mutations are observed in chat panel
 const callback = function(mutationsList, observer) {
@@ -12,6 +14,7 @@ const callback = function(mutationsList, observer) {
         if (mutation.type === 'childList') {
             if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
                 var message = mutation.addedNodes[0].innerText
+                console.log("chat mutation");
                 if (isStudent) {
                     processMessageToStudent(message)
                 }
@@ -31,14 +34,18 @@ const callback2 = function(mutationsList, observer) {
         if (mutation.type === 'childList') {
             if (mutation.addedNodes[0]) {
                 if (mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
-                    var message = mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc').innerText
-                    if (isStudent) {
-                        processMessageToStudent(message)
+                    //only notify the mutation if the rightPanel is closed
+                    if(!document.querySelector('[class=pw1uU]')){
+                        var message = mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc').innerText
+                        console.log("popup mutation");
+                        if (isStudent) {
+                            processMessageToStudent(message);
+                        }
+                        else {
+                            processMessageToAdmin(message);
+                        }
                     }
-                    else {
-                        console.log("soy admin! "+ message)
-                    }
-                    replacePopupChatMessages()
+                    replacePopupChatMessages();
                     break
                 }
             }
@@ -114,13 +121,12 @@ chrome.extension.onMessage.addListener(
                     if (result.isConfirmed) {
                         window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdQuestions, "_blank",);
                     }
-                })
+            })
         }
-        else if (request.msg == "questionObtained"){
+        else if (request.msg == "questionsObtained"){
             let questions = request.content.map(function(x){
                 return x[0];
             })
-            console.log(questions);
             Swal.fire({
                 title: 'Select a Question from your sheet',
                 input: 'select',
@@ -145,10 +151,16 @@ chrome.extension.onMessage.addListener(
                     })
                 }
             }).then((result) => {
+                console.log(result.dismiss)
                 let timeAsNumber = document.querySelector("#timepicker").valueAsNumber%3600000;
                 checkingForAnswers = true;
 
-                sendChatMessage("question/"+request.content[(result.value)].join(",")+","+timeAsNumber.toString());
+                question = request.content[(result.value)][0] //set the current question to the selected one
+                answers = request.content[(result.value)].slice(1).map(function(x){
+                    return [x];
+                }) //map the current question to an array of arrays, with each array having the alternative in the corresponding index
+
+                sendChatMessage("question/"+request.content[(result.value)].join(",")+"/"+timeAsNumber.toString());
 
                 let timerInterval
                 const Toast = Swal.mixin({
@@ -157,17 +169,15 @@ chrome.extension.onMessage.addListener(
                     showConfirmButton: false,
                     timer: timeAsNumber,
                     timerProgressBar: true
-                  })
+                })
                   
-                  Toast.fire({
+                Toast.fire({
                     icon: 'info',
-                    html: ' Time left for students to answer: <b></b> seconds.',
+                    html: 'Time left for students to answer: <b></b> seconds.',
                     onOpen: () => {
                         timerInterval = setInterval(() => {
-                            console.log("hola");
                             const content = Swal.getContent()
                             if (content) {
-                                console.log("content");
                                 const b = content.querySelector('b')
                                 if (b) {
                                     b.textContent = Math.ceil(Swal.getTimerLeft()/1000)
@@ -178,10 +188,24 @@ chrome.extension.onMessage.addListener(
                     onClose: () => {
                         clearInterval(timerInterval)
                     }
-                  }).then(function(){
+                }).then(function(){
                     checkingForAnswers = false;
-                  })
+                    logAnswers(request.courseFolderId);
+                })
                   
+            })
+        }
+        else if(request.msg == "answersLogged"){
+            Swal.fire({
+                title: "Your students' answers have been Logged Successfully",
+                text: "Do you want to see them?",
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: 'Open'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAnswers, "_blank",);
+                    }
             })
         }
     }
@@ -189,7 +213,7 @@ chrome.extension.onMessage.addListener(
 
 //renders the layout of the extension
 function addLayout(){
-    let sidePanel = document.querySelector('div[jsname="Kzha2e"]') //tablero de botones
+    let buttonBoard = document.querySelector('div[jsname="Kzha2e"]') //tablero de botones
     let panel = document.querySelector('[class=pw1uU]');// obtener el panel
 
     //observe popups
@@ -210,7 +234,7 @@ function addLayout(){
         myId = document.querySelector('[class=GvcuGe]').firstChild.getAttribute('data-participant-id').split('/').pop()
 
         //si es admin
-        if (sidePanel) {
+        if (buttonBoard) {
             isStudent = false
             if (!document.querySelector('#extraBoard')) {
             //Creamos un tablero de botones extra, para las funcionalidades no locales
@@ -276,7 +300,7 @@ function addLayout(){
             randomSelectButton.addEventListener("click",() => {showRandomSelectModal();});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(randomSelectButton,null);//insertar el boton en el tablero extra
 
-            sidePanel.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
+            buttonBoard.insertAdjacentElement('afterend',extraBoard); //insertamos el tablero extra abajo del tablero inicial.
             }
         }
     }
@@ -319,7 +343,7 @@ function showRandomSelectModal() {
         if (result.isConfirmed) {
           randomSelect()
         }
-      })
+    })
 }
 
 
@@ -489,8 +513,8 @@ function scrollList(element, participantIds, participantNames, courseName = null
         }
     }
     if (element.scrollTop > 0) {
-        var sl = setTimeout(function () {
-        scroll(num)
+            var sl = setTimeout(function () {
+            scroll(num)
         }, 200);
     }
 }
@@ -604,7 +628,7 @@ async function randomSelect() {
     }
   }
 
-  function sendChatMessage(message) {
+function sendChatMessage(message) {
     //Allow chat messages to true
     if (!document.querySelectorAll('[jsname=YPqjbf]')[0].checked) {
         document.querySelectorAll('[jsname=YPqjbf]')[0].click()
@@ -618,7 +642,7 @@ async function randomSelect() {
     }
     document.querySelector('[jsname=SoqoBf]').removeAttribute("aria-disabled")
     document.querySelector('[jsname=SoqoBf]').click()
-  }
+}
 
 function processMessageToStudent(message) {
     if (message.includes("selectStudent/")){
@@ -640,13 +664,63 @@ function processMessageToStudent(message) {
     }
 
     else if (message.includes("question/")) {
+        let incomingMessage = message.split("/");
+        let alternatives = incomingMessage[1].split(",");
+        let time = parseInt(incomingMessage[incomingMessage.length-1], 10);
 
+        let question = alternatives.shift();
+
+        let inputOptions = {}
+        for(const [i,alternative] of alternatives.entries()){
+            inputOptions[i] = alternative
+        }
+
+        openRightPanel()
+
+        let timerInterval
+        Swal.fire({
+            title: question,
+            html:"Time left to answer: <b></b> seconds.",
+            input: 'radio',
+            allowOutsideClick: false,
+            inputOptions: inputOptions,
+            timer: time,
+            timerProgressBar: true,
+            inputValidator: (value) => {
+              if (!value) {
+                return 'You need to choose something!'
+              }
+            },
+            onOpen: () => {
+                timerInterval = setInterval(() => {
+                    const content = Swal.getContent()
+                    if (content) {
+                        const b = content.querySelector('b')
+                        if (b) {
+                            b.textContent = Math.ceil(Swal.getTimerLeft()/1000)
+                        }
+                    }
+                }, 100)
+            },
+            onClose: () => {
+                clearInterval(timerInterval)
+            }
+        }).then(function(result){
+            if (result.dismiss === Swal.DismissReason.timer) {
+                console.log('I was closed by the timer')
+            }
+            else{
+                console.log(result.value);
+                sendChatMessage("answer/"+result.value+","+getMyName())
+            }
+        })
     }
 }
 
 function processMessageToAdmin(message) {
     if (message.includes("answer/") && checkingForAnswers) {
-
+        let [answerIndex, name] = message.split("/")[1].split(",");
+        answers[answerIndex].push(name);
     }
 }
 
@@ -657,19 +731,18 @@ function replaceChatMessages() {
         if (message.innerText.includes("selectStudent/"))
           message.innerText = "The teacher has selected a random student";
         else if (message.innerText.includes("question/"))
-          message.innerText = "The teacher has send a question: " + message.innerText.split(',')[1];
+          message.innerText = "The teacher has sent the question: " + message.innerText.split("/")[1].split(',')[0];
         else if (message.innerText.includes("answer/"))
-          message.innerText = message.innerText.split(',').pop() + " has been answer the question";
-    
+          message.innerText = message.innerText.split(',').pop() + " has answered the question";
       }
   
       else {
         if (message.innerText.includes("selectStudent/"))
           message.innerText = "A random student has been unmuted";
         else if (message.innerText.includes("question/"))
-          message.innerText = "You has been send the question: " + message.innerText.split(',')[1];
+          message.innerText = "You have been sent the question: " + message.innerText.split("/")[1].split(',')[0];
         else if (message.innerText.includes("answer/"))
-            message.innerText = message.innerText.split(',').pop() + " has been answer: " + message.innerText.split(',')[1];
+            message.innerText = message.innerText.split(',').pop() + " has answered: " + answers[parseInt(message.innerText.split("/")[1].split(',')[0])][0];
         
       }
     }
@@ -682,18 +755,53 @@ function replacePopupChatMessages() {
             if (message.innerText.includes("selectStudent/"))
                 message.innerText = "The teacher has selected a random student";
             else if (message.innerText.includes("question/"))
-                message.innerText = "The teacher has send a question";
+                message.innerText = "The teacher has sent a question";
             else if (message.innerText.includes("answer/"))
-                message.innerText = message.innerText.split(',').pop() + " has been answer the question";
+                message.innerText = message.innerText.split(',').pop() + " has answered the question";
             }
 
         else {
             if (message.innerText.includes("selectStudent/")) 
                 message.innerText = "A random student has been unmuted";
             else if (message.innerText.includes("question/"))
-                message.innerText = "You has been send a question";
+                message.innerText = "You have been sent a question";
             else if (message.innerText.includes("answer/"))
-                message.innerText = message.innerText.split(',').pop() + " has been answer: " + message.innerText.split(',')[1];
+                message.innerText = message.innerText.split(',').pop() + " has answered: " + answers[parseInt(message.innerText.split("/")[1].split(',')[0])][0];
         }
     }
+}
+
+
+function getMyName(){
+    let scripts = document.getElementsByTagName("script");
+    let script
+    let code = /key: 'ds:8'/gi;
+    for(i = 0;i < scripts.length; i++){
+        if(code.test(scripts[i].innerHTML)){
+            script = scripts[i];
+            break;
+        }
+    }
+
+    if(script){
+        script = script.innerHTML.replace(/AF_initDataCallback\(|\)/gi,"");
+        eval('var scr='+script);
+        return scr.data[6];
+    }
+}
+
+function openRightPanel(){
+    let panel = document.querySelector('[class=pw1uU]');// obtener el panel
+    if(!panel){
+        document.querySelector(".uArJ5e.UQuaGc.kCyAyd.QU4Gid.foXzLb.IeuGXd").click();
+    }
+}
+
+function logAnswers(courseFolderId){
+    chrome.runtime.sendMessage({
+        msg: 'logAnswers',
+        question: question,
+        answers: answers,
+        courseFolderId: courseFolderId
+    });
 }
