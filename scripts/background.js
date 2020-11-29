@@ -7,6 +7,9 @@ TODO: Add error handling for certain parts of the code: Use of tabs, ...
 
 */
 
+/*  CONFIGURATION FUNCTIONS  */
+
+//loads GAPI
 function onGAPILoad() {
   gapi.client.init({
     apiKey: API_KEY,
@@ -14,12 +17,65 @@ function onGAPILoad() {
   });
 }
 
+//creates and sets the MrMeet Folder, if it already exists then only sets it on the chrome storage.
+function setMrMeetFolder(){
+  console.log("token setted?: ", gapi.auth.getToken());
+  gapi.client.drive.files.list({
+    q: "name='Mr Meet'"
+  }).then( function(response) {
+    switch(response.status){
+      case 200:
+        if (response.result.files.length == 0) {
+          console.log('carpeta Mr Meet no existe');
+          createFolder("Mr Meet");
+        }
+        else{
+          console.log('carpeta Mr Meet ya existe');
+          //set the id of the folder in storage
+          chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
+            console.log('Setted Folder Id: ', response.result.files[0].id);
+          });
+        }
+        break;
+      default:
+        console.log('Error initializing gapi, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error initializing gapi"});
+        });
+        break;
+    }
+  });
+}
+
+//sets the OAUTH2 token and then creates then sets the MrMeet folder
+function setTokenAndFolder(){
+  chrome.identity.getAuthToken({interactive: true}, function(token) {
+    gapi.auth.setToken({
+      'access_token': token
+    })
+    setMrMeetFolder();
+  })
+}
+
+//returns a string with the current date and time with the following format: 'MM/DD/YYYY HH:MM:SS'
 function getDateTime(){
   let now = new Date();
   let date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
   return date;
 }
 
+/*
+FUNCTIONS FOR GOOGLE DRIVE AND GOOGLE SHEETS
+*/
+
+/*creates a folder in drive, optional parameters helps differentiate if the folder is the main MrMeet Folder or a course folder inside the main one
+  
+  To create a main folder use: createFolder('folderName')
+
+  To create a course folder use: createFolder(courseName, true, mainFolderID, studentNames); this will also pass the attendance for the course.
+
+*/
 function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names = null, courseFolderId = null) {
   var body = {
     'parents': isCourseFolder ? [mrmeetid] : [] , 
@@ -51,6 +107,86 @@ function createFolder(folderName, isCourseFolder = false, mrmeetid = null, names
     }
   });
 }
+
+//creates a spreadsheet inside a course folder, returns the spreadsheetID of the new spreadsheet
+async function createSpreadSheet(sheetName, courseFolderId){
+  var body = {
+    'parents': [courseFolderId], 
+    'name': sheetName,
+    'mimeType': "application/vnd.google-apps.spreadsheet"
+  };
+  var spreadSheetId = await gapi.client.drive.files.create({
+    'resource': body
+  }).then((response) => {
+    //console.log("RESPONSE",response);
+    switch(response.status){
+      case 200:
+        console.log(response.result)
+        return response.result.id
+      default:
+        console.log('Error creating the spreadsheet, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error creating course spreadsheet"});
+        });
+        break;
+    }
+  });
+  return spreadSheetId
+}
+
+// adds a sheet to a spreadsheet, returns the response of the batchUpdate call to the sheets API
+async function addSheet(spreadSheetId, title) {
+  var body = {
+    addSheet: {
+      properties: {
+        title: title,
+        index: 0
+      }
+    }
+  };
+  var reply = gapi.client.sheets.spreadsheets.batchUpdate({
+    spreadsheetId: spreadSheetId,
+    requests: body
+    }).then((response) => {
+      switch(response.status){
+        case 200:
+          console.log(response.result)
+          return response.replies
+        default:
+          console.log('Error adding the sheet, '+response);
+          //send error to content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error adding the sheet"});
+          });
+          break;
+        }
+    })
+    return reply
+}
+
+// functions that read a sheet inside a spredsheet and returns all the values as an array
+function readSheet(spreadSheetId, sheetName){
+  var content = gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: spreadSheetId,
+    range: sheetName+'!A1:Z1000'
+  }).then(async(response) => {
+    switch(response.status){
+      case 200:
+        return response.result.values
+      default:
+        console.log('Error reading the spreadsheet, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error reading data in course spreadsheet"});
+        });
+        break;
+    }
+  });
+  return content
+}
+
+/*  ATTENDANCE FUNCTIONS  */
 
 function passAttendance(courseName, names, courseFolderId){
   gapi.client.drive.files.list({
@@ -91,84 +227,6 @@ function passAttendance(courseName, names, courseFolderId){
     }
   });
 }
-
-async function createSpreadSheet(sheetName, courseFolderId){
-  var body = {
-    'parents': [courseFolderId], 
-    'name': sheetName,
-    'mimeType': "application/vnd.google-apps.spreadsheet"
-  };
-  var spreadSheetId = await gapi.client.drive.files.create({
-    'resource': body
-  }).then((response) => {
-    //console.log("RESPONSE",response);
-    switch(response.status){
-      case 200:
-        console.log(response.result)
-        return response.result.id
-      default:
-        console.log('Error creating the spreadsheet, '+response);
-        //send error to content script
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error creating course spreadsheet"});
-        });
-        break;
-    }
-  });
-  return spreadSheetId
-}
-
-async function addSheet(spreadSheetId, title) {
-  var body = {
-    addSheet: {
-      properties: {
-        title: title,
-        index: 0
-      }
-    }
-  };
-  var reply = gapi.client.sheets.spreadsheets.batchUpdate({
-    spreadsheetId: spreadSheetId,
-    requests: body
-    }).then((response) => {
-      switch(response.status){
-        case 200:
-          console.log(response.result)
-          return response.replies
-        default:
-          console.log('Error adding the sheet, '+response);
-          //send error to content script
-          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error adding the sheet"});
-          });
-          break;
-        }
-    })
-    return reply
-}
-
-
-function readSheet(spreadSheetId, sheetName){
-  var content = gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: spreadSheetId,
-    range: sheetName+'!A1:Z1000'
-  }).then(async(response) => {
-    switch(response.status){
-      case 200:
-        return response.result.values
-      default:
-        console.log('Error reading the spreadsheet, '+response);
-        //send error to content script
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error reading data in course spreadsheet"});
-        });
-        break;
-    }
-  });
-  return content
-}
-
-
 
 function manageAttendanceSheetContent(content, names) {
   //if doesnt have content add first column
@@ -267,7 +325,7 @@ async function addAttendanceSummaryToSheet(spreadSheetId){
     });
 }
 
-// QUESTION FUNCTIONS
+/*  QUESTION FUNCTIONS  */
 function checkQuestionSpreadsheet(courseName, courseFolderId){
   gapi.client.drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
@@ -335,7 +393,7 @@ function addQuestionFormatToSheet(spreadSheetId){
     });
 }
 
-//Answers functions
+/*  Answers functions */
 function checkAnswerSpreadheet(questionName, courseFolderId, answers){
   gapi.client.drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and parents in '"+courseFolderId+"'"
@@ -400,47 +458,6 @@ function addContentToSheetInSpreadsheet(spreadSheetId, content, sheetName){
     });
 }
 
-function setTokenAndFolder(){
-  chrome.identity.getAuthToken({interactive: true}, function(token) {
-    gapi.auth.setToken({
-      'access_token': token
-    })
-    setMrMeetFolder();
-  })
-
-}
-
-
-function setMrMeetFolder(){
-  console.log("token setted?: ", gapi.auth.getToken());
-  gapi.client.drive.files.list({
-    q: "name='Mr Meet'"
-  }).then( function(response) {
-    switch(response.status){
-      case 200:
-        if (response.result.files.length == 0) {
-          console.log('carpeta Mr Meet no existe');
-          createFolder("Mr Meet");
-        }
-        else{
-          console.log('carpeta Mr Meet ya existe');
-          //set the id of the folder in storage
-          chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
-            console.log('Setted Folder Id: ', response.result.files[0].id);
-          });
-        }
-        break;
-      default:
-        console.log('Error initializing gapi, '+response);
-        //send error to content script
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error initializing gapi"});
-        });
-        break;
-    }
-  });
-}
-
 //listeners for communication
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -449,7 +466,6 @@ chrome.extension.onMessage.addListener(
       setTokenAndFolder();
     }
     else if (request.msg == "attendance"){
-      setToken();
       //if is a new course
       if (request.courseFolderId == null) {
         chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
@@ -461,7 +477,6 @@ chrome.extension.onMessage.addListener(
       }
     }
     else if (request.msg == 'getCourses'){
-      setToken();
       chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
         gapi.client.drive.files.list({
           q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
@@ -496,11 +511,9 @@ chrome.extension.onMessage.addListener(
       });
     }
     else if (request.msg == "getQuestions"){
-      setToken();
       checkQuestionSpreadsheet(request.courseName ,request.courseFolderId);
     }
     else if (request.msg == "logAnswers"){
-      setToken();
       checkAnswerSpreadheet(request.question, request.courseFolderId, request.answers);
     }
   }
