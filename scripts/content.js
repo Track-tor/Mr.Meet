@@ -290,8 +290,9 @@ function addLayout(){
             observer.observe(chatPanel, config);
         }
     
-        myId = document.querySelector('[class=GvcuGe]').firstChild.getAttribute('data-participant-id').split('/').pop()
-
+        if (document.querySelector('[class=GvcuGe]')) {
+            myId = document.querySelector('[class=GvcuGe]').firstChild.getAttribute('data-participant-id').split('/').pop()
+        }
         //si es admin
         if (buttonBoard) {
             isStudent = false
