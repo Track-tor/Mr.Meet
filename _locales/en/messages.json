@@ -142,5 +142,23 @@
     },
     "answered":{
         "message": " has answered: "
+    },
+    "no_courses_available":{
+        "message": "You don't have courses available"
+    },
+    "no_courses_modal_text":{
+        "message": "Create one by passing attendance once!"
+    },
+    "html_modal_answers":{
+        "message": "Here's a quick summary:</br><canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas></br>Do you want to see them?"
+    },
+    "see_answers_button":{
+        "message": "See Answers"
+    },
+    "chart_text":{
+        "message": "Student Responses"
+    },
+    "logging_answers":{
+        "message": "Logging answers..."
     }
 }

@@ -142,5 +142,23 @@
     },
     "answered":{
         "message": " respondió: "
+    },
+    "no_courses_available":{
+        "message": "No tienes cursos disponibles"
+    },
+    "no_courses_modal_text":{
+        "message": "Crea uno tomando asistencia por primera vez"
+    },
+    "html_modal_answers":{
+        "message": "Resumen de respuestas:</br><canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas></br>¿Quieres ver el detalle?"
+    },
+    "see_answers_button":{
+        "message": "Ver Respuestas"
+    },
+    "chart_text":{
+        "message": "Respuestas Alumnos"
+    },
+    "logging_answers":{
+        "message": "Ingresando respuestas..."
     }
 }

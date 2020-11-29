@@ -92,8 +92,8 @@ chrome.extension.onMessage.addListener(
                 Swal.fire({
                     position: 'center',
                     icon: 'info',
-                    title: 'You have no courses availible!',
-                    text: 'Create one by passing attendance once!',
+                    title: chrome.i18n.getMessage("no_courses_available"),
+                    text: chrome.i18n.getMessage("no_courses_modal_text"),
                     showConfirmButton: false,
                     timer: 1500
                 })
@@ -208,7 +208,7 @@ chrome.extension.onMessage.addListener(
                         checkingForAnswers = false;
                         logAnswers(request.courseFolderId);
                         Swal.fire({
-                            title: 'Logging answers...',
+                            title: chrome.i18n.getMessage("logging_answers"),
                             allowEscapeKey: false,
                             allowOutsideClick: false,
                             onOpen: () => {
@@ -236,12 +236,12 @@ chrome.extension.onMessage.addListener(
                 borderColor.push(colors[1]);
             }
             Swal.fire({
-                html:`Here's a quick summary:</br><canvas id="myChart" width="400" height="400"></canvas></br>Do you wish to see them?`,
-                title: "Your students' answers have been Logged Successfully!",
+                html: chrome.i18n.getMessage("html_modal_answers"),
+                title: chrome.i18n.getMessage("html_moanswer_modal_success_titledal_answers"),
                 icon: "success",
                 showCancelButton: true,
-                cancelButtonText: 'Close',
-                confirmButtonText: 'See Answers',
+                cancelButtonText: chrome.i18n.getMessage("modal_cancel_button"),
+                confirmButtonText: chrome.i18n.getMessage("see_answers_button"),
                 onOpen: () =>{
                     var ctx = document.getElementById('myChart').getContext('2d');
                     new Chart(ctx, {
@@ -249,7 +249,7 @@ chrome.extension.onMessage.addListener(
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: "Your students' answers",
+                                label: chrome.i18n.getMessage("chart_text"),
                                 data: dataset,
                                 backgroundColor: backgroundColor,
                                 borderColor: borderColor,
