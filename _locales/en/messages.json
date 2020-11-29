@@ -1,6 +1,6 @@
 {
     "appName": {
-      "message": "My App"
+      "message": "Mr Meet"
     },
     "appDesc": {
       "message": "This app does something awesome."
@@ -73,5 +73,17 @@
     },
     "preparing_questions": {
         "message": "Preparing Questions"
+    },
+    "you_have_been_selected": {
+        "message": "You have been selected"
+    },
+    "mic_activated": {
+        "message": "Your microphone has been activated"
+    },
+    "html_answer_modal": {
+        "message": "Time left to answer: <b></b> seconds."
+    },
+    "choose_something": {
+        "message": "You need to choose something!"
     }
 }

@@ -1,11 +1,89 @@
 {
     "appName": {
-      "message": "Mi App"
-        },
-    "appDesc": {
-      "message": "Esta app hace algo maravilloso."
+      "message": "Mr Meet"
     },
-    "attendance": {
-        "message": "Asistencia"
+    "appDesc": {
+      "message": "This app does something awesome."
+    },
+    "attendance_button": {
+        "message": "Attendance"
+    },
+    "question_button": {
+        "message": "Question"
+    },
+    "random_select_button": {
+        "message": "Random Select"
+    },
+    "something_went_wrong": {
+        "message": "Something went wrong"
+    },
+    "no_participants": {
+        "message": "There are not participants in the meet"
+    },
+    "random_select_modal_title": {
+        "message": "Are you sure?"
+    },
+    "random_select_modal_text": {
+        "message": "A student will be selected at random and their microphone will be activated"
+    },
+    "random_select_modal_confirm_button": {
+        "message": "Select Random"
+    },
+    "select_a_course": {
+        "message": "Select a Course"
+    },
+    "attendance_modal_place_holder": {
+        "message": "Select a Course"
+    },
+    "attendance_modal_confirm_button": {
+        "message": "Take Attendance"
+    },
+    "modal_cancel_button": {
+        "message": "Cancel"
+    },
+    "attendance_modal_new_course_button": {
+        "message": "New Course"
+    },
+    "taking_attendance_modal_title": {
+        "message": "Taking attendance..."
+    },
+    "new_course_modal_title": {
+        "message": "Create a new course list"
+    },
+    "new_course_modal_place_holder": {
+        "message": "Type your course name here..."
+    },
+    "new_course_modal_already_exists": {
+        "message": "This course already exists"
+    },
+    "creating_files": {
+        "message": "Creating necessary files..."
+    },
+    "no_course_selected": {
+        "message": "You need to select a course"
+    },
+    "has_been_selected": {
+        "message": " has been selected"
+    },
+    "participant_selected_modal_text": {
+        "message": "His microphone has been activated"
+    },
+    "question_modal_confirm_button": {
+        "message": "Get Questions"
+    },
+    "preparing_questions": {
+        "message": "Preparing Questions"
+    },
+    "you_have_been_selected": {
+        "message": "You have been selected"
+    },
+    "mic_activated": {
+        "message": "Your microphone has been activated"
+    },
+    "html_answer_modal": {
+        "message": "Time left to answer: <b></b> seconds."
+    },
+    "choose_something": {
+        "message": "You need to choose something!"
     }
-  }
+}
