@@ -3,7 +3,7 @@
       "message": "Mr Meet"
     },
     "appDesc": {
-      "message": "Descripción de la app."
+      "message": "Agrega nuevas funcionalidades a Meet orientadas a las clases."
     },
     "attendance_button": {
         "message": "Asistencia"
@@ -160,5 +160,26 @@
     },
     "logging_answers":{
         "message": "Ingresando respuestas..."
+    },
+    "sample_question":{
+        "message": "¿Cuál es tu color favorito?"
+    },
+    "sample_answer_1":{
+        "message": "Verde"
+    },
+    "sample_answer_2":{
+        "message": "Rojo"
+    },
+    "sample_answer_3":{
+        "message": "Azuk"
+    },
+    "sample_answer_4":{
+        "message": "Otro"
+    },
+    "description_popup": {
+        "message": "Activa el switch para darle esteroides a Meet"
+    },
+    "title_popup": {
+        "message": "Funciones Mr Meet"
     }
 }

@@ -368,7 +368,7 @@ function checkQuestionSpreadsheet(courseName, courseFolderId){
 }
 
 function addQuestionFormatToSheet(spreadSheetId){
-  let exampleQuestion = [["Pregunta de ejemplo","respuesta 1","respuesta 2","respuesta 3","respuesta 4"]]
+  let exampleQuestion = [[chrome.i18n.getMessage("sample_question"),chrome.i18n.getMessage("sample_answer_1"),chrome.i18n.getMessage("sample_answer_2"),chrome.i18n.getMessage("sample_answer_3"),chrome.i18n.getMessage("sample_answer_4")]]
   gapi.client.sheets.spreadsheets.values.update({
     spreadsheetId: spreadSheetId,
     valueInputOption: 'USER_ENTERED',

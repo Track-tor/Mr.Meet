@@ -6,6 +6,9 @@
 
 // Runs setup script
 document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('[data-locale]').forEach(elem => {
+    elem.innerText = chrome.i18n.getMessage(elem.dataset.locale)
+  })
   restore_options();
   attachCheckboxHandlers();
 });

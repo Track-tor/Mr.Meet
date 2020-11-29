@@ -3,7 +3,7 @@
       "message": "Mr Meet"
     },
     "appDesc": {
-      "message": "This app does something awesome."
+      "message": "Adds new class-oriented functionality to meet."
     },
     "attendance_button": {
         "message": "Attendance"
@@ -158,7 +158,25 @@
     "chart_text":{
         "message": "Student Responses"
     },
-    "logging_answers":{
-        "message": "Logging answers..."
+    "sample_question":{
+        "message": "What is your favorite color?"
+    },
+    "sample_answer_1":{
+        "message": "Green"
+    },
+    "sample_answer_2":{
+        "message": "Red"
+    },
+    "sample_answer_3":{
+        "message": "Blue"
+    },
+    "sample_answer_4":{
+        "message": "Other"
+    },
+    "title_popup": {
+        "message": "Mr Meet Features"
+    },
+    "description_popup": {
+        "message": "Toggle switch to give steroids to Meet"
     }
 }
