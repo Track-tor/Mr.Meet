@@ -32,7 +32,9 @@ const callback = function(mutationsList, observer) {
 const callback2 = function(mutationsList, observer) {
     for(const mutation of mutationsList) {
         if (mutation.type === 'childList') {
-            if (mutation.addedNodes[0]) {
+            if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
+                console.log(mutation.addedNodes[0])
+                console.log(typeof mutation.addedNodes[0])
                 if (mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
                     //only notify the mutation if the rightPanel is closed
                     if(!document.querySelector('[class=pw1uU]')){
@@ -152,7 +154,6 @@ chrome.extension.onMessage.addListener(
                     })
                 }
             }).then((result) => {
-                console.log(result.dismiss)
                 if(result.dismiss == Swal.DismissReason.backdrop || result.dismiss == Swal.DismissReason.cancel){
                     console.log("Modal has been forcefully closed!")
                 }
@@ -225,9 +226,6 @@ chrome.extension.onMessage.addListener(
                 backgroundColor.push(colors[0]);
                 borderColor.push(colors[1]);
             }
-            console.log(backgroundColor);
-            console.log(borderColor);
-
             Swal.fire({
                 html:`Here's a quick summary:</br><canvas id="myChart" width="400" height="400"></canvas>`,
                 title: "Your students' answers have been Logged Successfully!",
@@ -489,7 +487,6 @@ function attendance(courseName, courseFolderId = null){
         if (values != undefined) {
             participantIds = values[0];
             participantNames = values[1];
-            //console.log(participantNames);
             var data = {
                 msg: "attendance",
                 names: participantNames,
@@ -549,7 +546,6 @@ function scrollList(element, participantIds, participantNames, courseName = null
             //if the scroll come from the attendance
             else {
                 setTimeout(function () {
-                    console.log("Value is set to " + participantNames);
                     var data = {
                         msg: "attendance",
                         names: participantNames,
@@ -698,8 +694,6 @@ function sendChatMessage(message) {
 function processMessageToStudent(message) {
     if (message.includes("selectStudent/")){
         selectedId = message.split('/').pop()
-        console.log(selectedId)
-        console.log(myId)
         
         if (selectedId == myId) {
             var isMuted = document.querySelector('[jsname=BOHaEe]').getAttribute('data-is-muted')
@@ -760,11 +754,9 @@ function processMessageToStudent(message) {
         }).then(function(result){
             //if the modal closed because of the timer 
             if (result.dismiss === Swal.DismissReason.timer) {
-                console.log('I was closed by the timer')
                 sendChatMessage("answer/"+alternatives.length+","+getMyName())
             }
             else{
-                console.log(result.value);
                 sendChatMessage("answer/"+result.value+","+getMyName())
             }
         })
@@ -796,8 +788,6 @@ function replaceChatMessages() {
         else if (message.innerText.includes("question/"))
           message.innerText = "You have sent the question: " + message.innerText.split("/")[1].split(',')[0];
         else if (message.innerText.includes("answer/")){
-            console.log(answers)
-            console.log(message.innerText.split("/")[1].split(','));
             message.innerText = message.innerText.split(',').pop() + " has answered: " + answers[parseInt(message.innerText.split("/")[1].split(',')[0])][0];
         }
       }
@@ -864,5 +854,6 @@ function logAnswers(courseFolderId){
 
 function generateColor(){
     const max = 255, o = Math.round, r = Math.random
-    return [`rgba(${o(r()*max)}, ${o(r()*max)}, ${o(r()*max)}, 0.2)`,`rgba(${o(r()*max)}, ${o(r()*max)}, ${o(r()*max)}, 1)`]
+    let R = o(r()*max), G = o(r()*max), B = o(r()*max)
+    return [`rgba(${R}, ${G}, ${B}, 0.2)`,`rgba(${R}, ${G}, ${B}, 1)`]
 }
