@@ -61,7 +61,7 @@ function setTokenAndFolder(){
 //returns a string with the current date and time with the following format: 'MM/DD/YYYY HH:MM:SS'
 function getDateTime(){
   let now = new Date();
-  let date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+  let date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + (now.getMinutes()<10?'0'+now.getMinutes():now.getMinutes()) + ':' + (now.getSeconds()<10?'0'+now.getSeconds():now.getSeconds());
   return date;
 }
 

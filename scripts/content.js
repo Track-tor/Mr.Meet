@@ -33,8 +33,6 @@ const callback2 = function(mutationsList, observer) {
     for(const mutation of mutationsList) {
         if (mutation.type === 'childList') {
             if (mutation && mutation.addedNodes && mutation.addedNodes[0] && mutation.addedNodes[0].innerText) {
-                console.log(mutation.addedNodes[0])
-                console.log(typeof mutation.addedNodes[0])
                 if (mutation.addedNodes[0].querySelector('.mVuLZ.xtO4Tc')) {
                     //only notify the mutation if the rightPanel is closed
                     if(!document.querySelector('[class=pw1uU]')){
@@ -87,7 +85,19 @@ chrome.extension.onMessage.addListener(
         }
         //si nos llegan los cursos para asistencia
         else if (request.msg == "sendCoursesForQuestions"){
-            selectCourseQuestionsModal(request.courses);
+            if(Object.keys(request.courses).length){
+                selectCourseQuestionsModal(request.courses);
+            }
+            else{
+                Swal.fire({
+                    position: 'center',
+                    icon: 'info',
+                    title: 'You have no courses availible!',
+                    text: 'Create one by passing attendance once!',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
         }
         else if (request.msg == "error") {
             Swal.fire({
@@ -231,8 +241,8 @@ chrome.extension.onMessage.addListener(
                 title: "Your students' answers have been Logged Successfully!",
                 icon: "success",
                 showCancelButton: true,
-                cancelButtonText: 'close',
-                confirmButtonText: 'See Sheet',
+                cancelButtonText: 'Close',
+                confirmButtonText: 'See Answers',
                 onOpen: () =>{
                     var ctx = document.getElementById('myChart').getContext('2d');
                     new Chart(ctx, {
@@ -704,7 +714,7 @@ function processMessageToStudent(message) {
             Swal.fire(
                 'You have been selected',
                 'Your microphone has been activated',
-                'question'
+                'info'
             )
         }
     }
