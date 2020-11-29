@@ -62,12 +62,12 @@ const observer2 = new MutationObserver(callback2);
 //listeners for communication
  var interval;
 
- chrome.storage.sync.get(['key'], function (result) {
+chrome.storage.sync.get(['key'], function (result) {
     if (result.key) {
         chrome.runtime.sendMessage({msg: 'initializeApi'});//intitializes api token and sets the Mr meet folder in drive
         interval = setInterval(addLayout, 500);
     }
- });
+});
 
 chrome.extension.onMessage.addListener(
     async function(request, sender, sendResponse) {

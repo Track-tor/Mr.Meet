@@ -355,13 +355,13 @@ function checkAnswerSpreadheet(questionName, courseFolderId, answers){
         if(exists){
           console.log("answer sheet exists...");
           var sheetQuestions = await addSheet(sheet.id, currentDatetime);
-          await addContentToSheetInSpreadsheet(sheet.id, answers, currentDatetime);
+          addContentToSheetInSpreadsheet(sheet.id, answers, currentDatetime);
         }
         else{
           console.log("creating answer sheet...");
           let spreadSheetId = await createSpreadSheet(questionName+" Answers", courseFolderId);
           var sheetQuestions = await addSheet(spreadSheetId, currentDatetime);
-          await addContentToSheetInSpreadsheet(spreadSheetId, answers, currentDatetime);
+          addContentToSheetInSpreadsheet(spreadSheetId, answers, currentDatetime);
         }
         break;
       default:
@@ -400,48 +400,56 @@ function addContentToSheetInSpreadsheet(spreadSheetId, content, sheetName){
     });
 }
 
+function setTokenAndFolder(){
+  chrome.identity.getAuthToken({interactive: true}, function(token) {
+    gapi.auth.setToken({
+      'access_token': token
+    })
+    setMrMeetFolder();
+  })
+
+}
+
+
+function setMrMeetFolder(){
+  console.log("token setted?: ", gapi.auth.getToken());
+  gapi.client.drive.files.list({
+    q: "name='Mr Meet'"
+  }).then( function(response) {
+    switch(response.status){
+      case 200:
+        if (response.result.files.length == 0) {
+          console.log('carpeta Mr Meet no existe');
+          createFolder("Mr Meet");
+        }
+        else{
+          console.log('carpeta Mr Meet ya existe');
+          //set the id of the folder in storage
+          chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
+            console.log('Setted Folder Id: ', response.result.files[0].id);
+          });
+        }
+        break;
+      default:
+        console.log('Error initializing gapi, '+response);
+        //send error to content script
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error initializing gapi"});
+        });
+        break;
+    }
+  });
+}
+
 //listeners for communication
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.msg == "initializeApi"){
-	chrome.identity.getAuthToken({interactive: true}, function(token) {
-        //set token in api
-        console.log('Accediendo a Token...');
-        gapi.auth.setToken({
-          'access_token': token
-        })
-        console.log('Token obtenido!');
-        //create Mr Meet root folder
-        console.log('Buscando carpeta Mr Meet...');
-        gapi.client.drive.files.list({
-          q: "name='Mr Meet'"
-        }).then( function(response) {
-          switch(response.status){
-            case 200:
-              if (response.result.files.length == 0) {
-                console.log('carpeta Mr Meet no existe');
-                createFolder("Mr Meet");
-              }
-              else{
-                console.log('carpeta Mr Meet ya existe');
-                //set the id of the folder in storage
-                chrome.storage.sync.set({mrmeetid: response.result.files[0].id}, function() {
-                  console.log('Setted Folder Id: ', response.result.files[0].id);
-                });
-              }
-              break;
-            default:
-              console.log('Error initializing gapi, '+response);
-              //send error to content script
-              chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {msg: "error", text: "Error initializing gapi"});
-              });
-              break;
-          }
-        });
-      })
+      console.log("initializing...")
+      setTokenAndFolder();
     }
     else if (request.msg == "attendance"){
+      setToken();
       //if is a new course
       if (request.courseFolderId == null) {
         chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
@@ -453,6 +461,7 @@ chrome.extension.onMessage.addListener(
       }
     }
     else if (request.msg == 'getCourses'){
+      setToken();
       chrome.storage.sync.get(['mrmeetid'], function (mrmeetid) {
         gapi.client.drive.files.list({
           q: "mimeType='application/vnd.google-apps.folder' and parents in '"+mrmeetid.mrmeetid+"'"
@@ -487,9 +496,11 @@ chrome.extension.onMessage.addListener(
       });
     }
     else if (request.msg == "getQuestions"){
+      setToken();
       checkQuestionSpreadsheet(request.courseName ,request.courseFolderId);
     }
     else if (request.msg == "logAnswers"){
+      setToken();
       checkAnswerSpreadheet(request.question, request.courseFolderId, request.answers);
     }
   }
