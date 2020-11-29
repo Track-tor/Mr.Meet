@@ -433,7 +433,7 @@ function showAttendanceModal(courses){
         //Take attendance
         if (result.isConfirmed && result.value) {
             Swal.fire({
-                title: chrome.i18n.getMessage("no_course_selected"),
+                title: chrome.i18n.getMessage("taking_attendance_modal_title"),
                 allowEscapeKey: false,
                 allowOutsideClick: false,
                 onOpen: () => {

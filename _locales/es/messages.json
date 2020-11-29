@@ -63,7 +63,7 @@
         "message": "¿Estás seguro?"
     },
     "random_select_modal_text": {
-        "message": "Se seleccionará un participante al azar y se le activará el micrófono"
+        "message": "Se seleccionará un participante al azar y se le activará su micrófono"
     },
     "random_select_modal_confirm_button": {
         "message": "Seleccionar"
