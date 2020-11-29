@@ -227,12 +227,12 @@ chrome.extension.onMessage.addListener(
                 borderColor.push(colors[1]);
             }
             Swal.fire({
-                html:`Here's a quick summary:</br><canvas id="myChart" width="400" height="400"></canvas>`,
+                html:`Here's a quick summary:</br><canvas id="myChart" width="400" height="400"></canvas></br>Do you wish to see them?`,
                 title: "Your students' answers have been Logged Successfully!",
-                text: "Do you want to see them?",
                 icon: "success",
                 showCancelButton: true,
-                confirmButtonText: 'Open',
+                cancelButtonText: 'close',
+                confirmButtonText: 'See Sheet',
                 onOpen: () =>{
                     var ctx = document.getElementById('myChart').getContext('2d');
                     new Chart(ctx, {
@@ -325,6 +325,7 @@ function addLayout(){
             </div>`;//le asignamos un formato en HTML
 
             questionButton.addEventListener("click",() => {
+                console.log(checkingForAnswers);
                 if(!checkingForAnswers){
                     getCourses('questions');
                 }
