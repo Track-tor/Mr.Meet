@@ -103,7 +103,7 @@ chrome.extension.onMessage.addListener(
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Something went wrong',
+                title: chrome.i18n.getMessage("something_went_wrong"),
                 text: request.text,
                 showConfirmButton: false,
                 timer: 1500
@@ -111,11 +111,11 @@ chrome.extension.onMessage.addListener(
         }
         else if (request.msg == "attendanceSuccessful") {
             Swal.fire({
-            title: 'Attendance taken successfully',
-            text: "Do you want to open it?",
+            title: chrome.i18n.getMessage("attendance_taken"),
+            text: chrome.i18n.getMessage("open_message"),
             icon: "success",
             showCancelButton: true,
-            confirmButtonText: 'Open'
+            confirmButtonText: chrome.i18n.getMessage("open")
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAttendance, "_blank",);
@@ -124,11 +124,11 @@ chrome.extension.onMessage.addListener(
         }
         else if (request.msg == "questionSheetCreationSuccesful"){
             Swal.fire({
-                title: 'Your Question Sheet has been Created Successfully',
-                text: "Do you want to open it?",
+                title: chrome.i18n.getMessage("question_modal_sheet_created"),
+                text: chrome.i18n.getMessage("open_message"),
                 icon: "success",
                 showCancelButton: true,
-                confirmButtonText: 'Open'
+                confirmButtonText: chrome.i18n.getMessage("open"),
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdQuestions, "_blank",);
@@ -140,15 +140,14 @@ chrome.extension.onMessage.addListener(
                 return x[0];
             })
             Swal.fire({
-                title: 'Select a Question from your sheet',
+                title: chrome.i18n.getMessage("question_modal_select_title"),
                 input: 'select',
-                html:   '<label for="timepicker">Time to answer: </label><input id="timepicker" type="time" max="01:59:59" step="1"> <br/>'+
-                        '2 additional seconds will be given to register answers!',
+                html:   chrome.i18n.getMessage("html_question_modal_time"),
                 inputOptions: questions,
-                inputPlaceholder: 'Select a question',
+                inputPlaceholder: chrome.i18n.getMessage("select_a_question"),
                 showCancelButton: true,
-                confirmButtonText: 'Send',
-                cancelButtonText: 'Cancel',
+                confirmButtonText: chrome.i18n.getMessage("send"),
+                cancelButtonText: chrome.i18n.getMessage("modal_cancel_button"),
                 inputValidator: (value) => {
                     return new Promise((resolve) => {
                       if (value) {
@@ -156,10 +155,10 @@ chrome.extension.onMessage.addListener(
                             resolve()
                           }
                           else{
-                            resolve('You need to set a valid time')
+                            resolve(chrome.i18n.getMessage("select_valid_time"))
                           }
                       } else {
-                        resolve('You need to select a question')
+                        resolve(chrome.i18n.getMessage("select_question"))
                       }
                     })
                 }
@@ -190,7 +189,7 @@ chrome.extension.onMessage.addListener(
 
                     Toast.fire({
                         icon: 'info',
-                        html: 'Time left for students to answer: <b></b> seconds.',
+                        html: chrome.i18n.getMessage("html_modal_time"),
                         onOpen: () => {
                             timerInterval = setInterval(() => {
                                 const content = Swal.getContent()
@@ -312,7 +311,7 @@ function addLayout(){
                         <div class="is878e">
                             <img src="${chrome.runtime.getURL('res/attendance.svg')}" width="20">
                         </div>
-                        <div class="GdrRqd">Attendance</div>
+                        <div class="GdrRqd">${chrome.i18n.getMessage("attendance_button")}</div>
                     </span>
                 </span>
             </div>`;//le asignamos un formato en HTML
@@ -330,7 +329,7 @@ function addLayout(){
                         <div class="is878e">
                             <img src="${chrome.runtime.getURL('res/question.svg')}" width="20">
                         </div>
-                        <div class="GdrRqd">Questions</div>
+                        <div class="GdrRqd">${chrome.i18n.getMessage("question_button")}</div>
                     </span>
                 </span>
             </div>`;//le asignamos un formato en HTML
@@ -353,7 +352,7 @@ function addLayout(){
                         <div class="is878e">
                         <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="Hdh4hc cIGbvc NMm5M"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17l-.59.59-.58.58V4h16v12z"></path><path d="M11 12h2v2h-2zm0-6h2v4h-2z"></path></svg>
                         </div>
-                        <div class="GdrRqd">Random Select</div>
+                        <div class="GdrRqd">${chrome.i18n.getMessage("random_select_button")}</div>
                     </span>
                 </span>
             </div>`;//le asignamos un formato en HTML
@@ -378,8 +377,8 @@ function getCourses(type){
     else{
         Swal.fire({
             icon: 'info',
-            title: 'Something went wrong',
-            text: "There are not participants in the meet",
+            title: chrome.i18n.getMessage("something_went_wrong"),
+            text: chrome.i18n.getMessage("no_participants"),
             showConfirmButton: true,
             onOpen: () => {
                 Swal.hideLoading();
@@ -395,11 +394,11 @@ function getQuestions(){
 
 function showRandomSelectModal() {
     Swal.fire({
-        title: 'Are you sure?',
-        text: "A student will be selected at random and their microphone will be activated",
+        title: chrome.i18n.getMessage("random_select_modal_title"),
+        text: chrome.i18n.getMessage("random_select_modal_text"),
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Select random'
+        confirmButtonText: chrome.i18n.getMessage("random_select_modal_confirm_button")
       }).then((result) => {
         if (result.isConfirmed) {
           randomSelect()
@@ -410,23 +409,23 @@ function showRandomSelectModal() {
 
 function showAttendanceModal(courses){
     Swal.fire({
-        title: 'Select a Course',
+        title: chrome.i18n.getMessage("select_a_course"),
         input: 'select',
         inputOptions: courses,
-        inputPlaceholder: 'Select a course',
+        inputPlaceholder: chrome.i18n.getMessage("attendance_modal_place_holder"),
         inputValue: defaultCourse,
         showCancelButton: true,
         showDenyButton: true,
-        confirmButtonText: 'Take Attendance',
-        cancelButtonText: 'Cancel',
-        denyButtonText: 'New Course',
+        confirmButtonText: chrome.i18n.getMessage("attendance_modal_confirm_button"),
+        cancelButtonText: chrome.i18n.getMessage("modal_cancel_button"),
+        denyButtonText: chrome.i18n.getMessage("attendance_modal_new_course_button"),
         denyButtonColor: 'LightSeaGreen',
         inputValidator: (value) => {
             return new Promise((resolve) => {
               if (value) {
                 resolve()
               } else {
-                resolve('You need to select a course')
+                resolve(chrome.i18n.getMessage("no_course_selected"))
               }
             })
         }
@@ -434,7 +433,7 @@ function showAttendanceModal(courses){
         //Take attendance
         if (result.isConfirmed && result.value) {
             Swal.fire({
-                title: 'Taking attendance...',
+                title: chrome.i18n.getMessage("no_course_selected"),
                 allowEscapeKey: false,
                 allowOutsideClick: false,
                 onOpen: () => {
@@ -447,9 +446,9 @@ function showAttendanceModal(courses){
         //Modal to create new course
         else if (result.isDenied) {
             Swal.fire({
-                title: 'Create a new course list',
+                title: chrome.i18n.getMessage("new_course_modal_title"),
                 input: 'text',
-                inputPlaceholder: 'Type your course name here...',
+                inputPlaceholder: chrome.i18n.getMessage("new_course_modal_place_holder"),
                 inputAttributes: {
                     'aria-label': 'Type your course name here'
                 },
@@ -457,7 +456,7 @@ function showAttendanceModal(courses){
                 inputValidator: (value) => {
                     return new Promise((resolve) => {
                       if (Object.values(courses).includes(value)) {
-                        resolve('This course already exists')
+                        resolve(chrome.i18n.getMessage("new_course_modal_already_exists"))
                       } else {
                         resolve()
                       }
@@ -467,7 +466,7 @@ function showAttendanceModal(courses){
                 //Take attendance
                 if (result2.isConfirmed) {
                     Swal.fire({
-                        title: 'Creating necessary files...',
+                        title: chrome.i18n.getMessage("creating_files"),
                         allowEscapeKey: false,
                         allowOutsideClick: false,
                         onOpen: () => {
@@ -514,8 +513,8 @@ function attendance(courseName, courseFolderId = null){
         else {
             Swal.fire({
                 icon: 'info',
-                title: 'Something went wrong',
-                text: "There are not participants in the meet",
+                title: chrome.i18n.getMessage("something_went_wrong"),
+                text: chrome.i18n.getMessage("no_participants"),
                 showConfirmButton: true,
                 onOpen: () => {
                     Swal.hideLoading();
@@ -548,8 +547,8 @@ function scrollList(element, participantIds, participantNames, courseName = null
                     sendChatMessage("selectStudent/" + selectedParticipant)
 
                     Swal.fire(
-                        participantNames[randomNumber] + ' has been selected',
-                        'His microphone has been activated',
+                        participantNames[randomNumber] + chrome.i18n.getMessage("has_been_selected"),
+                        chrome.i18n.getMessage("participant_selected_modal_text"),
                         'question'
                     )
 
@@ -605,27 +604,27 @@ function collectParticipants(participantIds, participantNames) {
 
 function selectCourseQuestionsModal(courses){
     Swal.fire({
-        title: 'Select a Course',
+        title: chrome.i18n.getMessage("select_a_course"),
         input: 'select',
         inputOptions: courses,
-        inputPlaceholder: 'Select a course',
+        inputPlaceholder: chrome.i18n.getMessage("select_a_course"),
         inputValue: defaultCourse,
         showCancelButton: true,
-        confirmButtonText: 'Get Questions',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: chrome.i18n.getMessage("question_modal_confirm_button"),
+        cancelButtonText: chrome.i18n.getMessage("modal_cancel_button"),
         inputValidator: (value) => {
             return new Promise((resolve) => {
               if (value) {
                 resolve()
               } else {
-                resolve('You need to select a course')
+                resolve(chrome.i18n.getMessage("no_course_selected"))
               }
             })
         }
     }).then((result) => {
         if (result.isConfirmed && result.value) {
             Swal.fire({
-                title: 'Preparing Questions',
+                title: chrome.i18n.getMessage("preparing_questions"),
                 allowEscapeKey: false,
                 allowOutsideClick: false,
                 onOpen: () => {
@@ -667,8 +666,8 @@ async function randomSelect() {
         sendChatMessage("selectStudent/" + selectedParticipant)
 
         Swal.fire(
-            participantNames[randomNumber] + ' has been selected',
-            'His microphone has been activated',
+            participantNames[randomNumber] + chrome.i18n.getMessage("has_been_selected"),
+            chrome.i18n.getMessage("participant_selected_modal_text"),
             'success'
         )
 
@@ -676,8 +675,8 @@ async function randomSelect() {
       else {
         Swal.fire({
             icon: 'info',
-            title: 'Something went wrong',
-            text: "There are not participants in the meet",
+            title: chrome.i18n.getMessage("something_went_wrong"),
+            text: chrome.i18n.getMessage("no_participants"),
             showConfirmButton: true,
             onOpen: () => {
                 Swal.hideLoading();
@@ -713,8 +712,8 @@ function processMessageToStudent(message) {
                 document.querySelector('[jsname=BOHaEe]').click()
             }
             Swal.fire(
-                'You have been selected',
-                'Your microphone has been activated',
+                chrome.i18n.getMessage("you_have_been_selected"),
+                chrome.i18n.getMessage("mic_activated"),
                 'info'
             )
         }
@@ -737,7 +736,7 @@ function processMessageToStudent(message) {
         let timerInterval
         Swal.fire({
             title: question,
-            html:"Time left to answer: <b></b> seconds.",
+            html:chrome.i18n.getMessage("html_answer_modal"),
             input: 'radio',
             allowOutsideClick: false,
             allowEscapeKey: false,
@@ -746,7 +745,7 @@ function processMessageToStudent(message) {
             timerProgressBar: true,
             inputValidator: (value) => {
               if (!value) {
-                return 'You need to choose something!'
+                return chrome.i18n.getMessage("choose_something")
               }
             },
             onOpen: () => {

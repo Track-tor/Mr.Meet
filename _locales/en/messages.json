@@ -1,0 +1,146 @@
+{
+    "appName": {
+      "message": "Mr Meet"
+    },
+    "appDesc": {
+      "message": "This app does something awesome."
+    },
+    "attendance_button": {
+        "message": "Attendance"
+    },
+    "attendance_taken": {
+        "message": "Attendance taken successfully"
+    },
+    "open_message": {
+        "message": "Do you want to open it?"
+    },
+    "open": {
+        "message": "Open"
+    },
+    "question_modal_sheet_created": {
+        "message": "Your Question Sheet has been created successfully"
+    },
+    "question_modal_select_title": {
+        "message": "Select a Question from your sheet"
+    },
+    "select_a_question": {
+        "message": "Select a Question"
+    },
+    "send": {
+        "message": "Send"
+    },
+    "html_modal_time": {
+        "message": "Time left for students to answer: <b></b> seconds."
+    },
+    "answer_modal_success_title": {
+        "message": "Your students answers have been logged successfully"
+    },
+    "answer_modal_success_text": {
+        "message": "Do you want to see them?"
+    },
+    "html_question_modal_time": {
+        "message": "<label for=\"timepicker\">Time to answer: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\"> <br/> \nTwo additional seconds will be given to register answers"
+    },
+    "select_valid_time": {
+        "message": "You need to set a valid time"
+    },
+    "select_question": {
+        "message": "You need to select a question"
+    },
+    "question_button": {
+        "message": "Question"
+    },
+    "random_select_button": {
+        "message": "Random Select"
+    },
+    "something_went_wrong": {
+        "message": "Something went wrong"
+    },
+    "no_participants": {
+        "message": "There are not participants in the meet"
+    },
+    "random_select_modal_title": {
+        "message": "Are you sure?"
+    },
+    "random_select_modal_text": {
+        "message": "A student will be selected at random and their microphone will be activated"
+    },
+    "random_select_modal_confirm_button": {
+        "message": "Select Random"
+    },
+    "select_a_course": {
+        "message": "Select a Course"
+    },
+    "attendance_modal_place_holder": {
+        "message": "Select a Course"
+    },
+    "attendance_modal_confirm_button": {
+        "message": "Take Attendance"
+    },
+    "modal_cancel_button": {
+        "message": "Cancel"
+    },
+    "attendance_modal_new_course_button": {
+        "message": "New Course"
+    },
+    "taking_attendance_modal_title": {
+        "message": "Taking attendance..."
+    },
+    "new_course_modal_title": {
+        "message": "Create a new course list"
+    },
+    "new_course_modal_place_holder": {
+        "message": "Type your course name here..."
+    },
+    "new_course_modal_already_exists": {
+        "message": "This course already exists"
+    },
+    "creating_files": {
+        "message": "Creating necessary files..."
+    },
+    "no_course_selected": {
+        "message": "You need to select a course"
+    },
+    "has_been_selected": {
+        "message": " has been selected"
+    },
+    "participant_selected_modal_text": {
+        "message": "His microphone has been activated"
+    },
+    "question_modal_confirm_button": {
+        "message": "Get Questions"
+    },
+    "preparing_questions": {
+        "message": "Preparing Questions"
+    },
+    "you_have_been_selected": {
+        "message": "You have been selected"
+    },
+    "mic_activated": {
+        "message": "Your microphone has been activated"
+    },
+    "html_answer_modal": {
+        "message": "Time left to answer: <b></b> seconds."
+    },
+    "choose_something": {
+        "message": "You need to choose something!"
+    },
+    "teacher_selected": {
+        "message": "The teacher has selected a random student"
+    },
+    "teacher_sent":{
+        "message": "The teacher has sent the question: "
+    },
+    "student_answered":{
+        "message": " has answered the question"
+    },
+    "student_unmuted":{
+        "message": "A random student has been unmuted"
+    },
+    "sent_question":{
+        "message":"You have sent the question: "
+    },
+    "answered":{
+        "message": " has answered: "
+    }
+}

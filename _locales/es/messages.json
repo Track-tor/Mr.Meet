@@ -1,0 +1,146 @@
+{
+    "appName": {
+      "message": "Mr Meet"
+    },
+    "appDesc": {
+      "message": "Descripción de la app."
+    },
+    "attendance_button": {
+        "message": "Asistencia"
+    },
+    "attendance_taken": {
+        "message": "Asistencia tomada con éxito"
+    },
+    "open_message": {
+        "message": "¿Quieres abrirla?"
+    },
+    "open": {
+        "message": "Abrir"
+    },
+    "question_modal_sheet_created": {
+        "message": "Hoja de Cálculos de Preguntas creada con éxito"
+    },
+    "question_modal_select_title": {
+        "message": "Selecciona una pregunta de tu Hoja de Cálculos"
+    },
+    "select_a_question": {
+        "message": "Selecciona una pregunta"
+    },
+    "send": {
+        "message": "Enviar"
+    },
+    "html_modal_time": {
+        "message": "Tiempo restante para los alumnos: <b></b> segundos."
+    },
+    "answer_modal_success_title": {
+        "message": "Las respuestas de los estudiantes se han guardado con éxito"
+    },
+    "answer_modal_success_text": {
+        "message": "¿Las quieres ver?"
+    },
+    "html_question_modal_time": {
+        "message": "<label for=\"timepicker\">Tiempo para responder: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\"> <br/> \nSe darán dos segundos extra para registrar las preguntas"
+    },
+    "select_valid_time": {
+        "message": "Tienes que ingresar un tiempo válido"
+    },
+    "select_question": {
+        "message": "Tienes que seleccionar una pregunta"
+    },
+    "question_button": {
+        "message": "Pregunta"
+    },
+    "random_select_button": {
+        "message": "Selección Aleatoria"
+    },
+    "something_went_wrong": {
+        "message": "Algo salió mal"
+    },
+    "no_participants": {
+        "message": "No hay participantes en la reunión."
+    },
+    "random_select_modal_title": {
+        "message": "¿Estás seguro?"
+    },
+    "random_select_modal_text": {
+        "message": "Se seleccionará un participante al azar y se le activará el micrófono"
+    },
+    "random_select_modal_confirm_button": {
+        "message": "Seleccionar"
+    },
+    "select_a_course": {
+        "message": "Selecciona un curso"
+    },
+    "attendance_modal_place_holder": {
+        "message": "Selecciona un curso"
+    },
+    "attendance_modal_confirm_button": {
+        "message": "Tomar Asistencia"
+    },
+    "modal_cancel_button": {
+        "message": "Cancelar"
+    },
+    "attendance_modal_new_course_button": {
+        "message": "Nuevo Curso"
+    },
+    "taking_attendance_modal_title": {
+        "message": "Tomando asistencia..."
+    },
+    "new_course_modal_title": {
+        "message": "Crear una lista para un curso"
+    },
+    "new_course_modal_place_holder": {
+        "message": "Escribe el nombre del curso aquí..."
+    },
+    "new_course_modal_already_exists": {
+        "message": "Este curso ya existe"
+    },
+    "creating_files": {
+        "message": "Creando archivos necesarios..."
+    },
+    "no_course_selected": {
+        "message": "Tienes que seleccionar un curso"
+    },
+    "has_been_selected": {
+        "message": " ha sido seleccionado"
+    },
+    "participant_selected_modal_text": {
+        "message": "Su micrófono se ha activado"
+    },
+    "question_modal_confirm_button": {
+        "message": "Buscar Preguntas"
+    },
+    "preparing_questions": {
+        "message": "Preparando Preguntas"
+    },
+    "you_have_been_selected": {
+        "message": "Has sido seleccionado"
+    },
+    "mic_activated": {
+        "message": "Tu micrófono ha sido activado"
+    },
+    "html_answer_modal": {
+        "message": "Tiempo restante para responder: <b></b> segundos."
+    },
+    "choose_something": {
+        "message": "Debes seleccionar una alternativa"
+    },
+    "teacher_selected": {
+        "message": "El profesor ha seleccionado a un estudiante al azar."
+    },
+    "teacher_sent":{
+        "message": "El profesor ha mandado la pregunta: "
+    },
+    "student_answered":{
+        "message": " respondió la pregunta."
+    },
+    "student_unmuted":{
+        "message": "Un estudiante ha sido desmuteado."
+    },
+    "sent_question":{
+        "message":"Has enviado la pregunta: "
+    },
+    "answered":{
+        "message": " respondió: "
+    }
+}
