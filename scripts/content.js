@@ -135,7 +135,7 @@ chrome.extension.onMessage.addListener(
                 inputPlaceholder: chrome.i18n.getMessage("select_a_question"),
                 showCancelButton: true,
                 confirmButtonText: chrome.i18n.getMessage("send"),
-                cancelButtonText: chrome.i18n.getMessage("cancel"),
+                cancelButtonText: chrome.i18n.getMessage("modal_cancel_button"),
                 inputValidator: (value) => {
                     return new Promise((resolve) => {
                       if (value) {
@@ -297,7 +297,7 @@ function addLayout(){
                         <div class="is878e">
                         <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="Hdh4hc cIGbvc NMm5M"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17l-.59.59-.58.58V4h16v12z"></path><path d="M11 12h2v2h-2zm0-6h2v4h-2z"></path></svg>
                         </div>
-                        <div class="GdrRqd">${chrome.i18n.getMessage("question_button")}</div>
+                        <div class="GdrRqd">${chrome.i18n.getMessage("random_select_button")}</div>
                     </span>
                 </span>
             </div>`;//le asignamos un formato en HTML

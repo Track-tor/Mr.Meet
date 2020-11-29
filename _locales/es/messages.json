@@ -42,7 +42,7 @@
         "message": "<label for=\"timepicker\">Tiempo para responder: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\"> <br/> \nSe darán dos segundos extra para registrar las preguntas"
     },
     "select_valid_time": {
-        "message": "Tienes que ingresar un tiempo valido"
+        "message": "Tienes que ingresar un tiempo válido"
     },
     "select_question": {
         "message": "Tienes que seleccionar una pregunta"
@@ -111,7 +111,7 @@
         "message": "Buscar Preguntas"
     },
     "preparing_questions": {
-        "message": "Preparango Preguntas"
+        "message": "Preparando Preguntas"
     },
     "you_have_been_selected": {
         "message": "Has sido seleccionado"
