@@ -18,7 +18,7 @@
         "message": "Open"
     },
     "question_modal_sheet_created": {
-        "message": "Your Question Sheet has been Created Successfully"
+        "message": "Your Question Sheet has been created successfully"
     },
     "question_modal_select_title": {
         "message": "Select a Question from your sheet"
@@ -27,10 +27,19 @@
         "message": "Select a Question"
     },
     "send": {
-        "message": "send"
+        "message": "Send"
+    },
+    "html_modal_time": {
+        "message": "Time left for students to answer: <b></b> seconds."
+    },
+    "answer_modal_success_title": {
+        "message": "Your students answers have been logged successfully"
+    },
+    "answer_modal_success_text": {
+        "message": "Do you want to see them?"
     },
     "html_question_modal_time": {
-        "message": "<label for=\"timepicker\">Time to answer: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\"> <br/> \n2 additional seconds will be given to register answers!"
+        "message": "<label for=\"timepicker\">Time to answer: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\"> <br/> \nTwo additional seconds will be given to register answers"
     },
     "select_valid_time": {
         "message": "You need to set a valid time"

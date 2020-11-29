@@ -8,6 +8,45 @@
     "attendance_button": {
         "message": "Asistencia"
     },
+    "attendance_taken": {
+        "message": "Asistencia tomada con éxito"
+    },
+    "open_message": {
+        "message": "¿Quieres abrirla?"
+    },
+    "open": {
+        "message": "Abrir"
+    },
+    "question_modal_sheet_created": {
+        "message": "Hoja de Cálculos de Preguntas creada con éxito"
+    },
+    "question_modal_select_title": {
+        "message": "Selecciona una pregunta de tu Hoja de Cálculos"
+    },
+    "select_a_question": {
+        "message": "Selecciona una pregunta"
+    },
+    "send": {
+        "message": "Enviar"
+    },
+    "html_modal_time": {
+        "message": "Tiempo restante para los alumnos: <b></b> segundos."
+    },
+    "answer_modal_success_title": {
+        "message": "Las respuestas de los estudiantes se han guardado con éxito"
+    },
+    "answer_modal_success_text": {
+        "message": "¿Las quieres ver?"
+    },
+    "html_question_modal_time": {
+        "message": "<label for=\"timepicker\">Tiempo para responder: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\"> <br/> \nSe darán dos segundos extra para registrar las preguntas"
+    },
+    "select_valid_time": {
+        "message": "Tienes que ingresar un tiempo valido"
+    },
+    "select_question": {
+        "message": "Tienes que seleccionar una pregunta"
+    },
     "question_button": {
         "message": "Pregunta"
     },

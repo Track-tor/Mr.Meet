@@ -178,7 +178,7 @@ chrome.extension.onMessage.addListener(
 
                     Toast.fire({
                         icon: 'info',
-                        html: 'Time left for students to answer: <b></b> seconds.',
+                        html: chrome.i18n.getMessage("html_modal_time"),
                         onOpen: () => {
                             timerInterval = setInterval(() => {
                                 const content = Swal.getContent()
@@ -202,11 +202,11 @@ chrome.extension.onMessage.addListener(
         }
         else if(request.msg == "answersLogged"){
             Swal.fire({
-                title: "Your students' answers have been Logged Successfully",
-                text: "Do you want to see them?",
+                title: chrome.i18n.getMessage("answer_modal_success_title"),
+                text: chrome.i18n.getMessage("answer_modal_success_text"),
                 icon: "success",
                 showCancelButton: true,
-                confirmButtonText: 'Open'
+                confirmButtonText: chrome.i18n.getMessage("open")
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAnswers, "_blank",);
