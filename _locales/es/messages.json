@@ -85,5 +85,23 @@
     },
     "choose_something": {
         "message": "Debes seleccionar una alternativa"
+    },
+    "teacher_selected": {
+        "message": "El profesor ha seleccionado a un estudiante al azar."
+    },
+    "teacher_sent":{
+        "message": "El profesor ha mandado la pregunta: "
+    },
+    "student_answered":{
+        "message": " respondió la pregunta."
+    },
+    "student_unmuted":{
+        "message": "Un estudiante ha sido desmuteado."
+    },
+    "sent_question":{
+        "message":"Has enviado la pregunta: "
+    },
+    "answered":{
+        "message": " respondió: "
     }
 }
