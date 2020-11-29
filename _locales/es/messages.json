@@ -3,87 +3,87 @@
       "message": "Mr Meet"
     },
     "appDesc": {
-      "message": "This app does something awesome."
+      "message": "Descripción de la app."
     },
     "attendance_button": {
-        "message": "Attendance"
+        "message": "Asistencia"
     },
     "question_button": {
-        "message": "Question"
+        "message": "Pregunta"
     },
     "random_select_button": {
-        "message": "Random Select"
+        "message": "Selección Aleatoria"
     },
     "something_went_wrong": {
-        "message": "Something went wrong"
+        "message": "Algo salió mal"
     },
     "no_participants": {
-        "message": "There are not participants in the meet"
+        "message": "No hay participantes en la reunión."
     },
     "random_select_modal_title": {
-        "message": "Are you sure?"
+        "message": "¿Estás seguro?"
     },
     "random_select_modal_text": {
-        "message": "A student will be selected at random and their microphone will be activated"
+        "message": "Se seleccionará un participante al azar y se le activará el micrófono"
     },
     "random_select_modal_confirm_button": {
-        "message": "Select Random"
+        "message": "Seleccionar"
     },
     "select_a_course": {
-        "message": "Select a Course"
+        "message": "Selecciona un curso"
     },
     "attendance_modal_place_holder": {
-        "message": "Select a Course"
+        "message": "Selecciona un curso"
     },
     "attendance_modal_confirm_button": {
-        "message": "Take Attendance"
+        "message": "Tomar Asistencia"
     },
     "modal_cancel_button": {
-        "message": "Cancel"
+        "message": "Cancelar"
     },
     "attendance_modal_new_course_button": {
-        "message": "New Course"
+        "message": "Nuevo Curso"
     },
     "taking_attendance_modal_title": {
-        "message": "Taking attendance..."
+        "message": "Tomando asistencia..."
     },
     "new_course_modal_title": {
-        "message": "Create a new course list"
+        "message": "Crear una lista para un curso"
     },
     "new_course_modal_place_holder": {
-        "message": "Type your course name here..."
+        "message": "Escribe el nombre del curso aquí..."
     },
     "new_course_modal_already_exists": {
-        "message": "This course already exists"
+        "message": "Este curso ya existe"
     },
     "creating_files": {
-        "message": "Creating necessary files..."
+        "message": "Creando archivos necesarios..."
     },
     "no_course_selected": {
-        "message": "You need to select a course"
+        "message": "Tienes que seleccionar un curso"
     },
     "has_been_selected": {
-        "message": " has been selected"
+        "message": " ha sido seleccionado"
     },
     "participant_selected_modal_text": {
-        "message": "His microphone has been activated"
+        "message": "Su micrófono se ha activado"
     },
     "question_modal_confirm_button": {
-        "message": "Get Questions"
+        "message": "Buscar Preguntas"
     },
     "preparing_questions": {
-        "message": "Preparing Questions"
+        "message": "Preparango Preguntas"
     },
     "you_have_been_selected": {
-        "message": "You have been selected"
+        "message": "Has sido seleccionado"
     },
     "mic_activated": {
-        "message": "Your microphone has been activated"
+        "message": "Tu micrófono ha sido activado"
     },
     "html_answer_modal": {
-        "message": "Time left to answer: <b></b> seconds."
+        "message": "Tiempo restante para responder: <b></b> segundos."
     },
     "choose_something": {
-        "message": "You need to choose something!"
+        "message": "Debes seleccionar una alternativa"
     }
 }

@@ -91,7 +91,7 @@ chrome.extension.onMessage.addListener(
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Something went wrong',
+                title: chrome.i18n.getMessage("something_went_wrong"),
                 text: request.text,
                 showConfirmButton: false,
                 timer: 1500
@@ -99,11 +99,11 @@ chrome.extension.onMessage.addListener(
         }
         else if (request.msg == "attendanceSuccessful") {
             Swal.fire({
-            title: 'Attendance taken successfully',
-            text: "Do you want to open it?",
+            title: chrome.i18n.getMessage("attendance_taken"),
+            text: chrome.i18n.getMessage("open_message"),
             icon: "success",
             showCancelButton: true,
-            confirmButtonText: 'Open'
+            confirmButtonText: chrome.i18n.getMessage("open")
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdAttendance, "_blank",);
@@ -112,11 +112,11 @@ chrome.extension.onMessage.addListener(
         }
         else if (request.msg == "questionSheetCreationSuccesful"){
             Swal.fire({
-                title: 'Your Question Sheet has been Created Successfully',
-                text: "Do you want to open it?",
+                title: chrome.i18n.getMessage("question_modal_sheet_created"),
+                text: chrome.i18n.getMessage("open_message"),
                 icon: "success",
                 showCancelButton: true,
-                confirmButtonText: 'Open'
+                confirmButtonText: chrome.i18n.getMessage("open"),
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.open("https://docs.google.com/spreadsheets/d/" + request.spreadSheetIdQuestions, "_blank",);
@@ -128,15 +128,14 @@ chrome.extension.onMessage.addListener(
                 return x[0];
             })
             Swal.fire({
-                title: 'Select a Question from your sheet',
+                title: chrome.i18n.getMessage("question_modal_select_title"),
                 input: 'select',
-                html:   '<label for="timepicker">Time to answer: </label><input id="timepicker" type="time" max="01:59:59" step="1"> <br/>'+
-                        '2 additional seconds will be given to register answers!',
+                html:   chrome.i18n.getMessage("html_question_modal_time"),
                 inputOptions: questions,
-                inputPlaceholder: 'Select a question',
+                inputPlaceholder: chrome.i18n.getMessage("select_a_question"),
                 showCancelButton: true,
-                confirmButtonText: 'Send',
-                cancelButtonText: 'Cancel',
+                confirmButtonText: chrome.i18n.getMessage("send"),
+                cancelButtonText: chrome.i18n.getMessage("cancel"),
                 inputValidator: (value) => {
                     return new Promise((resolve) => {
                       if (value) {
@@ -144,10 +143,10 @@ chrome.extension.onMessage.addListener(
                             resolve()
                           }
                           else{
-                            resolve('You need to set a valid time')
+                            resolve(chrome.i18n.getMessage("select_valid_time"))
                           }
                       } else {
-                        resolve('You need to select a question')
+                        resolve(chrome.i18n.getMessage("select_question"))
                       }
                     })
                 }
@@ -662,8 +661,8 @@ function processMessageToStudent(message) {
                 document.querySelector('[jsname=BOHaEe]').click()
             }
             Swal.fire(
-                'You have been selected',
-                'Your microphone has been activated',
+                chrome.i18n.getMessage("you_have_been_selected"),
+                chrome.i18n.getMessage("mic_activated"),
                 'question'
             )
         }
@@ -686,7 +685,7 @@ function processMessageToStudent(message) {
         let timerInterval
         Swal.fire({
             title: question,
-            html:"Time left to answer: <b></b> seconds.",
+            html:chrome.i18n.getMessage("html_answer_modal"),
             input: 'radio',
             allowOutsideClick: false,
             allowEscapeKey: false,
@@ -695,7 +694,7 @@ function processMessageToStudent(message) {
             timerProgressBar: true,
             inputValidator: (value) => {
               if (!value) {
-                return 'You need to choose something!'
+                return chrome.i18n.getMessage("choose_something")
               }
             },
             onOpen: () => {
