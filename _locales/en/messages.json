@@ -114,6 +114,24 @@
         "message": "Time left to answer: <b></b> seconds."
     },
     "choose_something": {
-        "message": "You need to choose something"
+        "message": "You need to choose something!"
+    },
+    "teacher_selected": {
+        "message": "The teacher has selected a random student"
+    },
+    "teacher_sent":{
+        "message": "The teacher has sent the question: "
+    },
+    "student_answered":{
+        "message": " has answered the question"
+    },
+    "student_unmuted":{
+        "message": "A random student has been unmuted"
+    },
+    "sent_question":{
+        "message":"You have sent the question: "
+    },
+    "answered":{
+        "message": " has answered: "
     }
 }
