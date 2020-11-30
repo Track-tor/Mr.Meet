@@ -39,7 +39,7 @@
         "message": "¿Las quieres ver?"
     },
     "html_question_modal_time": {
-        "message": "<label for=\"timepicker\">Tiempo para responder: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\"> <br/> \nSe darán dos segundos extra para registrar las preguntas"
+        "message": "Se darán dos segundos extra para registrar las preguntas</br><label for=\"timepicker\">Tiempo para responder: </label><input id=\"timepicker\" type=\"time\" max=\"01:59:59\" step=\"1\" value=\"00:00:00\">"
     },
     "select_valid_time": {
         "message": "Tienes que ingresar un tiempo válido"
