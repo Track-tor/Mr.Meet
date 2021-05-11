@@ -1,9 +1,9 @@
 {
     "appName": {
-      "message": "Mr Meet"
+      "message": "Mr Meet - Take Attendance & Send Questions"
     },
     "appDesc": {
-      "message": "Adds new class-oriented functionality to Google Meet."
+      "message": "Adds new class-oriented functionality to Google Meet. Take attendance, send questions and select a random student."
     },
     "attendance_button": {
         "message": "Attendance"

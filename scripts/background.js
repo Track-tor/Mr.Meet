@@ -1,4 +1,3 @@
-const API_KEY = 'AIzaSyCqS8Ur850llY5mXGy9QA7OsCwpx0wweBw';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://sheets.googleapis.com/$discovery/rest?version=v4"];
 
 /*
@@ -12,7 +11,6 @@ TODO: Add error handling for certain parts of the code: Use of tabs, ...
 //loads GAPI
 function onGAPILoad() {
   gapi.client.init({
-    apiKey: API_KEY,
     discoveryDocs: DISCOVERY_DOCS,
   });
 }

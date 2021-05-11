@@ -1,9 +1,9 @@
 {
     "appName": {
-      "message": "Mr Meet"
+      "message": "Mr Meet - Toma Asistencia y Envía Preguntas"
     },
     "appDesc": {
-      "message": "Agrega nuevas funcionalidades a Google Meet orientadas a las clases."
+      "message": "Agrega nuevas funcionalidades a Google Meet orientadas a las clases. Tomar asistencia, enviar preguntas y selección aleatoria de un alumno."
     },
     "attendance_button": {
         "message": "Asistencia"
