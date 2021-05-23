@@ -83,7 +83,7 @@ chrome.extension.onMessage.addListener(
         else if (request.msg == "sendCourses"){
             showAttendanceModal(request.courses);
         }
-        //si nos llegan los cursos para asistencia
+        //si nos llegan los cursos para preguntas
         else if (request.msg == "sendCoursesForQuestions"){
             if(Object.keys(request.courses).length){
                 selectCourseQuestionsModal(request.courses);
@@ -268,6 +268,13 @@ chrome.extension.onMessage.addListener(
     }
 );
 
+//For new UI
+function isPanelOpen() {
+    let panel = document.querySelector('.R3Gmyc.qwU8Me.qdulke');// obtener el panel cerrado
+    if (panel == null) return true;
+    return false; 
+}
+
 //renders the layout of the extension
 function addLayout(){
     let buttonBoard = document.querySelector('div[jsname="Kzha2e"]') //tablero de botones
@@ -407,6 +414,7 @@ function showRandomSelectModal() {
 }
 
 
+
 function showAttendanceModal(courses){
     Swal.fire({
         title: chrome.i18n.getMessage("select_a_course"),
@@ -436,8 +444,16 @@ function showAttendanceModal(courses){
                 title: chrome.i18n.getMessage("taking_attendance_modal_title"),
                 allowEscapeKey: false,
                 allowOutsideClick: false,
+                timer: 25000,
                 onOpen: () => {
                     Swal.showLoading();
+                },
+                onClose: () => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Timeout',
+                        text: chrome.i18n.getMessage("something_went_wrong")
+                      })
                 }
             })
             defaultCourse = result.value
@@ -469,8 +485,16 @@ function showAttendanceModal(courses){
                         title: chrome.i18n.getMessage("creating_files"),
                         allowEscapeKey: false,
                         allowOutsideClick: false,
+                        timer: 25000,
                         onOpen: () => {
                             Swal.showLoading();
+                        },
+                        onClose: () => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Timeout',
+                                text: chrome.i18n.getMessage("something_went_wrong")
+                              })
                         }
                     })
                     attendance(result2.value);
@@ -484,7 +508,11 @@ function attendance(courseName, courseFolderId = null){
     //TODO: MEJORAR
     var participantIds = [];
     var participantNames = [];
+    
+    //For the new UI
+    //var element = document.querySelector('.ggUFBf.Ze1Fpc');
     var element = document.querySelector('[role="tabpanel"]')
+    
     element.scrollTop = element.scrollHeight;
 
     //the panel is scrolleable
@@ -648,6 +676,10 @@ function getQuestions(courseName, courseFolderId){
 async function randomSelect() {
     var participantIds = [];
     var participantNames = [];
+
+    //For the new UI
+    //var element = document.querySelector('.ggUFBf.Ze1Fpc');;
+    
     var element = document.querySelector('[role="tabpanel"]')
     element.scrollTop = element.scrollHeight;
   

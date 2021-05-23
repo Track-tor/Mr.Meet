@@ -486,12 +486,15 @@ chrome.extension.onMessage.addListener(
               for (let element of response.result.files){
                 courseNames[element.id] = element.name;
               }
+
+              var sortedCourseNames = sortDictionaryByValue(courseNames);
+
               chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                 if (request.type == 'attendance'){
-                  chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCourses", courses: courseNames});
+                  chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCourses", courses: sortedCourseNames});
                 }
                 else if(request.type == 'questions'){
-                  chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCoursesForQuestions", courses: courseNames});
+                  chrome.tabs.sendMessage(tabs[0].id, {msg: "sendCoursesForQuestions", courses: sortedCourseNames});
                 }
                 
               });
@@ -516,3 +519,23 @@ chrome.extension.onMessage.addListener(
     }
   }
 );
+
+function sortDictionaryByValue(obj)
+{
+	var sortable=[];
+	for(var key in obj)
+		if(obj.hasOwnProperty(key))
+			sortable.push([key, obj[key]]);
+	
+	sortable.sort(function(a, b)
+	{
+		var x=a[1].toLowerCase(),
+			y=b[1].toLowerCase();
+		return x<y ? -1 : x>y ? 1 : 0;
+	});
+  var newObject = {};
+  for (i = 0; i < sortable.length; i++) {
+      newObject[sortable[i][0]] = sortable[i][1];
+  }
+  return newObject;
+}
