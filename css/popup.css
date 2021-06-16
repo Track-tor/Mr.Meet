@@ -1,8 +1,8 @@
 /* Popup */
 html,
-body {
+.container {
   text-align: center;
-  width: 250px;
+  width: 300px;
   padding-bottom: 8px;
 }
 

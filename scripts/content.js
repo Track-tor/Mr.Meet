@@ -277,8 +277,7 @@ function isPanelOpen() {
 
 //renders the layout of the extension
 function addLayout(){
-    let buttonBoard = document.querySelector('div[jsname="Kzha2e"]') //tablero de botones
-    let panel = document.querySelector('[class=pw1uU]');// obtener el panel
+    let buttonBoard = document.querySelector('.fIHLXc') //tablero de botones
 
     //observe popups
     const chatPopup = document.querySelector('.NSvDmb.cM3h5d')
@@ -286,7 +285,7 @@ function addLayout(){
         observer2.observe(chatPopup, config);
     }
     
-    if(panel){ // si el panel esta abierto
+    if(isPanelOpen()){ // si el panel esta abierto
         //reemplazamos los mensajes del chat con comandos
         replaceChatMessages()
 
@@ -306,40 +305,39 @@ function addLayout(){
             //Creamos un tablero de botones extra, para las funcionalidades no locales
             let extraBoard = document.createElement("div");
             extraBoard.setAttribute("id","extraBoard");
-            extraBoard.setAttribute("class", "Lf3gob");
+            extraBoard.setAttribute("class", "fIHLXc");
 
             //ATTENDANCE BUTTON
-            let attendanceButton = document.createElement("div");//creamos una division dentro del tablero
+            let attendanceButton = document.createElement("span");//creamos una division dentro del tablero
         
-            attendanceButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
-                <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
+            attendanceButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd QU4Gid Bs3rEf I9c2Ed XQICaf YY1gRd M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="YCC4Fc" aria-label="All muted" tabindex="0" data-response-delay-ms="2000">
+                <div class="Fvio9d MbhUzd" jsname="ksKsZd" style="top: 49px; left: 43.2969px; width: 98px; height: 98px;"></div>
+                <div class="e19J0b CeoRYc"></div>
                 <span jsslot="" class="l4V7wb Fxmcue">
-                    <span class="NPEfkd RveJvd snByac">
-                        <div class="is878e">
-                            <img src="${chrome.runtime.getURL('res/attendance.svg')}" width="20">
-                        </div>
-                        <div class="GdrRqd">${chrome.i18n.getMessage("attendance_button")}</div>
-                    </span>
+                <span class="NPEfkd RveJvd snByac">
+                    <div class=""><i class="google-material-icons RpOp4b PdvwN" aria-hidden="true">how_to_reg</i></div>
+                    <div class="GdrRqd WhQQ6d">${chrome.i18n.getMessage("attendance_button")}</div>
                 </span>
-            </div>`;//le asignamos un formato en HTML
+                </span>
+            </div>`;
+
 
             attendanceButton.addEventListener("click",() => {getCourses('attendance');});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(attendanceButton,null);//insertar el boton en el tablero extra
 
             //QUESTIONS BUTTON
-            let questionButton = document.createElement("div");//creamos una division dentro del tablero
+            let questionButton = document.createElement("span");//creamos una division dentro del tablero
         
-            questionButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
-                <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
+            questionButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd QU4Gid Bs3rEf I9c2Ed XQICaf YY1gRd M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="YCC4Fc" aria-label="All muted" tabindex="0" data-response-delay-ms="2000">
+                <div class="Fvio9d MbhUzd" jsname="ksKsZd" style="top: 49px; left: 43.2969px; width: 98px; height: 98px;"></div>
+                <div class="e19J0b CeoRYc"></div>
                 <span jsslot="" class="l4V7wb Fxmcue">
-                    <span class="NPEfkd RveJvd snByac">
-                        <div class="is878e">
-                            <img src="${chrome.runtime.getURL('res/question.svg')}" width="20">
-                        </div>
-                        <div class="GdrRqd">${chrome.i18n.getMessage("question_button")}</div>
-                    </span>
+                <span class="NPEfkd RveJvd snByac">
+                    <div class=""><i class="google-material-icons RpOp4b PdvwN" aria-hidden="true">question_answer</i></div>
+                    <div class="GdrRqd WhQQ6d">${chrome.i18n.getMessage("question_button")}</div>
                 </span>
-            </div>`;//le asignamos un formato en HTML
+                </span>
+            </div>`;
 
             questionButton.addEventListener("click",() => {
                 console.log(checkingForAnswers);
@@ -350,19 +348,18 @@ function addLayout(){
             extraBoard.insertBefore(questionButton,null);//insertar el boton en el tablero extra
 
             //RANDOM SELECT BUTTON
-            let randomSelectButton = document.createElement("div");//creamos una division dentro del tablero
+            let randomSelectButton = document.createElement("span");//creamos una division dentro del tablero
 
-            randomSelectButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd kW31ib Bs3rEf I9c2Ed M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="BVty0" aria-label="Agregar personas" aria-disabled="false" tabindex="0">
-                <div class="Fvio9d MbhUzd" jsname="ksKsZd"></div><div class="e19J0b CeoRYc"></div>
+            randomSelectButton.innerHTML = `<div jsshadow="" role="button" class="uArJ5e UQuaGc kCyAyd QU4Gid Bs3rEf I9c2Ed XQICaf YY1gRd M9Bg4d" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef" jsname="YCC4Fc" aria-label="All muted" tabindex="0" data-response-delay-ms="2000">
+                <div class="Fvio9d MbhUzd" jsname="ksKsZd" style="top: 49px; left: 43.2969px; width: 98px; height: 98px;"></div>
+                <div class="e19J0b CeoRYc"></div>
                 <span jsslot="" class="l4V7wb Fxmcue">
-                    <span class="NPEfkd RveJvd snByac">
-                        <div class="is878e">
-                        <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="Hdh4hc cIGbvc NMm5M"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17l-.59.59-.58.58V4h16v12z"></path><path d="M11 12h2v2h-2zm0-6h2v4h-2z"></path></svg>
-                        </div>
-                        <div class="GdrRqd">${chrome.i18n.getMessage("random_select_button")}</div>
-                    </span>
+                <span class="NPEfkd RveJvd snByac">
+                    <div class=""><i class="google-material-icons RpOp4b PdvwN" aria-hidden="true">feedback</i></div>
+                    <div class="GdrRqd WhQQ6d">${chrome.i18n.getMessage("random_select_button")}</div>
                 </span>
-            </div>`;//le asignamos un formato en HTML
+                </span>
+            </div>`;
 
             randomSelectButton.addEventListener("click",() => {showRandomSelectModal();});//le agregamos la funcion de tomar asistencia
             extraBoard.insertBefore(randomSelectButton,null);//insertar el boton en el tablero extra
@@ -510,8 +507,8 @@ function attendance(courseName, courseFolderId = null){
     var participantNames = [];
     
     //For the new UI
-    //var element = document.querySelector('.ggUFBf.Ze1Fpc');
-    var element = document.querySelector('[role="tabpanel"]')
+    var element = document.querySelector('.ggUFBf.Ze1Fpc');
+    
     
     element.scrollTop = element.scrollHeight;
 
@@ -678,9 +675,8 @@ async function randomSelect() {
     var participantNames = [];
 
     //For the new UI
-    //var element = document.querySelector('.ggUFBf.Ze1Fpc');;
+    var element = document.querySelector('.ggUFBf.Ze1Fpc');
     
-    var element = document.querySelector('[role="tabpanel"]')
     element.scrollTop = element.scrollHeight;
   
     if (element.scrollTop != 0) {

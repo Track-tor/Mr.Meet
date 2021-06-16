@@ -4,16 +4,19 @@
     <link rel="stylesheet" type="text/css" href="/css/popup.css"/>
   </head>
   <body>
-    <div class="headerLogo">
-        <img src="../images/128.png" />
+    <div class="container">
+      <div class="headerLogo">
+          <img src="../images/128.png" width="100" height="100"/>
+      </div>
+      <h2 data-locale="title_popup">Mr. Meet Features</h2>
+      <p data-locale="description_popup">Toggle switch to give steroids to Meet</p>
+      <!-- Rounded switch -->
+      <label class="switch">
+        <input id="check" type="checkbox">
+        <span class="slider round"></span>
+      </label>
     </div>
-    <h2 data-locale="title_popup">Mr. Meet Features</h2>
-    <p data-locale="description_popup">Toggle switch to give steroids to Meet</p>
-    <!-- Rounded switch -->
-    <label class="switch">
-      <input id="check" type="checkbox">
-      <span class="slider round"></span>
-    </label>
+    <p>Do you like the extension? <a href="https://chrome.google.com/webstore/detail/mr-meet-take-attendance-s/fdhheadalkifaaojckbmgkandahpaiml" target="_blank">Please rate us!</a></p>
     <script src="../scripts/popup.js"></script>
   </body>
 </html>
