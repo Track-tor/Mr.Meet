@@ -271,13 +271,22 @@ chrome.extension.onMessage.addListener(
 //For new UI
 function isPanelOpen() {
     let panel = document.querySelector('.R3Gmyc.qwU8Me.qdulke');// obtener el panel cerrado
+
+    let panelOldUi = document.querySelector('.pw1uU');
+
     if (panel == null) return true;
+    if (panelOldUi != null) return true;
     return false; 
 }
 
 //renders the layout of the extension
 function addLayout(){
     let buttonBoard = document.querySelector('.fIHLXc') //tablero de botones
+
+    //old ui
+    if (buttonBoard == null){
+        buttonBoard = document.querySelector('div[jsname="Kzha2e"]')
+    }
 
     //observe popups
     const chatPopup = document.querySelector('.NSvDmb.cM3h5d')
@@ -302,10 +311,15 @@ function addLayout(){
         if (buttonBoard) {
             isStudent = false
             if (!document.querySelector('#extraBoard')) {
-            //Creamos un tablero de botones extra, para las funcionalidades no locales
+            //Creamos un tablero de botones extra, para las funcionalidades
             let extraBoard = document.createElement("div");
             extraBoard.setAttribute("id","extraBoard");
-            extraBoard.setAttribute("class", "fIHLXc");
+            if (document.querySelector(".fIHLXc") != null) {
+                extraBoard.setAttribute("class", "fIHLXc");
+            }
+            else {
+                extraBoard.setAttribute("class", "Lf3gob");
+            }
 
             //ATTENDANCE BUTTON
             let attendanceButton = document.createElement("span");//creamos una division dentro del tablero
@@ -506,15 +520,17 @@ function attendance(courseName, courseFolderId = null){
     var participantIds = [];
     var participantNames = [];
     
+    var tabPanel = document.querySelector('[role="tabpanel"]')
     //For the new UI
-    var element = document.querySelector('.ggUFBf.Ze1Fpc');
+    if (tabPanel == null){
+        tabPanel = document.querySelector('.ggUFBf.Ze1Fpc');
+    }
     
-    
-    element.scrollTop = element.scrollHeight;
+    tabPanel.scrollTop = tabPanel.scrollHeight;
 
     //the panel is scrolleable
-    if (element.scrollTop != 0) {
-        var participantNames = scrollList(element, participantIds, participantNames, courseName, courseFolderId);
+    if (tabPanel.scrollTop != 0) {
+        var participantNames = scrollList(tabPanel, participantIds, participantNames, courseName, courseFolderId);
     }
     //the panel is not scrolleable
     else {
@@ -674,13 +690,16 @@ async function randomSelect() {
     var participantIds = [];
     var participantNames = [];
 
+    var tabPanel = document.querySelector('[role="tabpanel"]')
     //For the new UI
-    var element = document.querySelector('.ggUFBf.Ze1Fpc');
+    if (tabPanel == null){
+        tabPanel = document.querySelector('.ggUFBf.Ze1Fpc');
+    }
     
-    element.scrollTop = element.scrollHeight;
+    tabPanel.scrollTop = tabPanel.scrollHeight;
   
-    if (element.scrollTop != 0) {
-      var participantNames = scrollList(element, participantIds, participantNames);
+    if (tabPanel.scrollTop != 0) {
+      var participantNames = scrollList(tabPanel, participantIds, participantNames);
     }
     else {
       let values = collectParticipants(participantIds, participantNames);
