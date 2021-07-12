@@ -181,5 +181,17 @@
     },
     "title_popup": {
         "message": "Funciones Mr Meet"
+    },
+    "like_extension_text": {
+        "message": "¿Te gusta la extensión?"
+    },
+    "rate_us_text": {
+        "message": "Escribe una reseña!"
+    },
+    "answer_form_text": {
+        "message": "Responde esta pregunta"
+    },
+    "form_link": {
+        "message": "https://forms.gle/6NFQ3rYXAM8LiNkN8"
     }
 }

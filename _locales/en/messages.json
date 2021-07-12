@@ -178,5 +178,17 @@
     },
     "description_popup": {
         "message": "Toggle switch to give steroids to Meet"
+    },
+    "like_extension_text": {
+        "message": "Do you like the extension?"
+    },
+    "rate_us_text": {
+        "message": "Please rate us!"
+    },
+    "answer_form_text": {
+        "message": "Answer this short question"
+    },
+    "form_link": {
+        "message": "https://forms.gle/4b1Vi2CvHqR84t397"
     }
 }

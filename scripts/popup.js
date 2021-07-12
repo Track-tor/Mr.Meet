@@ -8,6 +8,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('[data-locale]').forEach(elem => {
     elem.innerText = chrome.i18n.getMessage(elem.dataset.locale)
+    if (elem.dataset.locale == "answer_form_text") {
+      elem.href = chrome.i18n.getMessage("form_link")
+    }
   })
   restore_options();
   attachCheckboxHandlers();
